@@ -17,23 +17,27 @@ public interface FluidInterface extends BodyPartInterface {
 
 	@Override
 	public AbstractFluidType getType();
-	
+
 	public FluidFlavour getFlavour();
 	public String setFlavour(GameCharacter owner, FluidFlavour flavour);
-	
-	
+
+
 	public List<FluidModifier> getFluidModifiers();
-	
+
 	public boolean hasFluidModifier(FluidModifier fluidModifier);
-	
+
 	public String addFluidModifier(GameCharacter owner, FluidModifier fluidModifier);
 	public String removeFluidModifier(GameCharacter owner, FluidModifier fluidModifier);
-	
-	
+
+
 	public List<ItemEffect> getTransformativeEffects();
 	public void addTransformativeEffect(ItemEffect ie);
-	
-	
+
+
 	public float getValuePerMl();
-	
+
+	public default boolean isCrotchMilk() {
+		return false;
+	}
+
 }
