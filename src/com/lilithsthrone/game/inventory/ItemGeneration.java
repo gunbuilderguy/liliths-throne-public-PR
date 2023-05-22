@@ -42,7 +42,11 @@ public class ItemGeneration {
 	public AbstractItem generateItem(String id) {
 		return new AbstractItem(ItemType.getItemTypeFromId(id)) {};
 	}
-	
+
+	public AbstractItem generateItem(AbstractItem item) {
+		return new AbstractItem(item) {};
+	}
+
 	public AbstractItem generateItem(AbstractItemType itemType) {
 		return new AbstractItem(itemType) {};
 	}
