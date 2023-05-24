@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.lilithsthrone.game.character.FluidStored;
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.attributes.Attribute;
 import com.lilithsthrone.game.character.body.coverings.AbstractBodyCoveringType;
@@ -386,28 +387,28 @@ public class ItemEffectType {
 //					+ "</p>");
 //		}
 //	};
-	
+
 
 	public static AbstractItemEffectType MOO_MILKER = new AbstractItemEffectType(Util.newArrayListOfValues(
 			"Milks breasts."),
 			PresetColour.GENERIC_SEX) {
-		
+
 		@Override
 		public String itemEffectOverride(TFModifier primaryModifier, TFModifier secondaryModifier, TFPotency potency, int limit, GameCharacter user, GameCharacter target, ItemEffectTimer timer) {
 			int milkPumped = (int) Math.min(target.getBreastRawStoredMilkValue(), ItemType.getMooMilkerMaxMilk());
 			target.incrementBreastStoredMilk(-milkPumped);
 			if(target.isPlayer()) {
 				return "<p>"
-							+ "It only takes a moment before the beaker is filled with "+ Units.fluid(milkPumped, Units.UnitType.LONG)+" of your [pc.milk]."
+						+ "It only takes a moment before the beaker is filled with "+ Units.fluid(milkPumped, Units.UnitType.LONG)+" of your [pc.milk]."
 						+ "</p>"
-						+ user.addItem(Main.game.getItemGen().generateFilledBreastPump(ItemType.MOO_MILKER_EMPTY.getColourShades().get(0), target, target.getMilk(), milkPumped), false, true);
-			
+						+ user.addItem(Main.game.getItemGen().generateFilledBreastPump(ItemType.MOO_MILKER_EMPTY.getColourShades().get(0), new FluidStored(target, target.getMilk(), milkPumped)), false, true);
+
 			} else {
 				return UtilText.parse(target,
 						"<p>"
-							+ "It only takes a moment before the beaker is filled with "+Units.fluid(milkPumped, Units.UnitType.LONG)+" of [npc.her] [npc.milk]."
-						+ "</p>"
-						+ user.addItem(Main.game.getItemGen().generateFilledBreastPump(ItemType.MOO_MILKER_EMPTY.getColourShades().get(0), target, target.getMilk(), milkPumped), false, true));
+								+ "It only takes a moment before the beaker is filled with "+Units.fluid(milkPumped, Units.UnitType.LONG)+" of [npc.her] [npc.milk]."
+								+ "</p>"
+								+ user.addItem(Main.game.getItemGen().generateFilledBreastPump(ItemType.MOO_MILKER_EMPTY.getColourShades().get(0), new FluidStored(target, target.getMilk(), milkPumped)), false, true));
 			}
 		}
 	};

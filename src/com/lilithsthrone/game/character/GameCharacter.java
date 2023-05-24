@@ -8377,13 +8377,13 @@ public abstract class GameCharacter implements XMLSaving {
 									} else {
 										ingestFluidSB.append(UtilText.parse(partner, "<p class='centre noPad'>[npc.NamePos] [npc.cum] was [style.boldGood(caught in [npc.her] condom)]!</p>"));
 										ingestFluidSB.append(Main.game.getPlayer().addItem(
-												Main.game.getItemGen().generateFilledCondom(
-														partner.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
-															?ItemType.CONDOM_USED_WEBBING
-															:ItemType.CONDOM_USED,
-														partner.getClothingInSlot(InventorySlot.PENIS).getColour(0),
-														partner, partner.getCum(), partner.getPenisRawOrgasmCumQuantity()),
-												false, true));
+                                                Main.game.getItemGen().generateFilledCondom(
+                                                        this.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
+                                                                ?ItemType.CONDOM_USED_WEBBING
+                                                                :ItemType.CONDOM_USED,
+                                                        this.getClothingInSlot(InventorySlot.PENIS).getColour(0),
+                                                        new FluidStored(this, this.getCum(), this.getPenisRawOrgasmCumQuantity())),
+                                                false, true));
 									}
 									partner.getClothingInSlot(InventorySlot.PENIS).setSealed(false);
 									partner.unequipClothingIntoVoid(partner.getClothingInSlot(InventorySlot.PENIS), true, partner);
@@ -8884,13 +8884,13 @@ public abstract class GameCharacter implements XMLSaving {
 									} else {
 										ingestFluidSB.append(UtilText.parse(this, "<p class='centre noPad'>[npc.NamePos] [npc.cum] was [style.boldGood(caught in [npc.her] condom)]!</p>"));
 										ingestFluidSB.append(Main.game.getPlayer().addItem(
-												Main.game.getItemGen().generateFilledCondom(
-														this.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
-															?ItemType.CONDOM_USED_WEBBING
-															:ItemType.CONDOM_USED,
-														this.getClothingInSlot(InventorySlot.PENIS).getColour(0),
-														this, this.getCum(), this.getPenisRawOrgasmCumQuantity()),
-												false, true));
+                                                Main.game.getItemGen().generateFilledCondom(
+                                                        this.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
+                                                                ?ItemType.CONDOM_USED_WEBBING
+                                                                :ItemType.CONDOM_USED,
+                                                        this.getClothingInSlot(InventorySlot.PENIS).getColour(0),
+                                                        new FluidStored(this, this.getCum(), this.getPenisRawOrgasmCumQuantity())),
+                                                false, true));
 									}
 									this.getClothingInSlot(InventorySlot.PENIS).setSealed(false);
 									this.unequipClothingIntoVoid(this.getClothingInSlot(InventorySlot.PENIS), true, this);
@@ -9351,15 +9351,13 @@ public abstract class GameCharacter implements XMLSaving {
 					if(GenericOrgasms.GENERIC_ORGASM_CREAMPIE.getCondomFailure(partner, this)==CondomFailure.NONE) {
 						ingestFluidSB.append(UtilText.parse(partner, "<p class='centre noPad'>[npc.NamePos] [npc.cum] was [style.boldGood(caught in [npc.her] condom)]!</p>"));
 						ingestFluidSB.append(Main.game.getPlayer().addItem(
-								Main.game.getItemGen().generateFilledCondom(
-										partner.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
-											?ItemType.CONDOM_USED_WEBBING
-											:ItemType.CONDOM_USED,
-										partner.getClothingInSlot(InventorySlot.PENIS).getColour(0),
-										partner,
-										partner.getCum(),
-										partner.getPenisRawOrgasmCumQuantity()),
-								false, true));
+                                Main.game.getItemGen().generateFilledCondom(
+                                        partner.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
+                                                ?ItemType.CONDOM_USED_WEBBING
+                                                :ItemType.CONDOM_USED,
+                                        partner.getClothingInSlot(InventorySlot.PENIS).getColour(0),
+                                        new FluidStored(partner, partner.getCum(), partner.getPenisRawOrgasmCumQuantity())),
+                                false));
 					}
 					partner.getClothingInSlot(InventorySlot.PENIS).setSealed(false);
 					partner.unequipClothingIntoVoid(partner.getClothingInSlot(InventorySlot.PENIS), true, partner);
@@ -9371,15 +9369,13 @@ public abstract class GameCharacter implements XMLSaving {
 					if(GenericOrgasms.GENERIC_ORGASM_CREAMPIE.getCondomFailure(this, partner)==CondomFailure.NONE) {
 						ingestFluidSB.append(UtilText.parse(this, "<p class='centre noPad'>[npc.NamePos] [npc.cum] was [style.boldGood(caught in [npc.her] condom)]!</p>"));
 						ingestFluidSB.append(Main.game.getPlayer().addItem(
-								Main.game.getItemGen().generateFilledCondom(
-										this.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
-											?ItemType.CONDOM_USED_WEBBING
-											:ItemType.CONDOM_USED,
-										this.getClothingInSlot(InventorySlot.PENIS).getColour(0),
-										this,
-										this.getCum(),
-										this.getPenisRawOrgasmCumQuantity()),
-								false, true));
+                                Main.game.getItemGen().generateFilledCondom(
+                                        this.getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
+                                                ?ItemType.CONDOM_USED_WEBBING
+                                                :ItemType.CONDOM_USED,
+                                        this.getClothingInSlot(InventorySlot.PENIS).getColour(0),
+                                        new FluidStored(this, this.getCum(), this.getPenisRawOrgasmCumQuantity())),
+                                false, true));
 					}
 					this.getClothingInSlot(InventorySlot.PENIS).setSealed(false);
 					this.unequipClothingIntoVoid(this.getClothingInSlot(InventorySlot.PENIS), true, this);
@@ -18375,174 +18371,11 @@ public abstract class GameCharacter implements XMLSaving {
 	 * @return A <b>formatted paragraph</b> description of addiction increasing/satisfied, or an empty String if no addictive effects occur.
 	 */
 	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, FluidInterface fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
-		StringBuilder fluidIngestionSB = new StringBuilder();
-		
-		List<FluidModifier> modifiers = fluid.getFluidModifiers();
-		
-		boolean found = false;
-		
-		if((orificeIngestedThrough.equals(SexAreaOrifice.VAGINA) || orificeIngestedThrough.equals(SexAreaOrifice.URETHRA_VAGINA)) && this.isVisiblyPregnant()) { // Limit intake based on 250ml max for pregnant characters:
-			millilitres = Math.min(millilitres, 250-this.getTotalFluidInArea(orificeIngestedThrough));
-		}
-		
-		FluidStored newFluid;
-		if(fluid instanceof FluidCum) {
-			if(charactersFluid!=null) {
-				newFluid = new FluidStored(charactersFluid, ((FluidCum) fluid), millilitres);
-			} else {
-				newFluid = new FluidStored("", subspecies, halfDemonSubspecies, ((FluidCum) fluid), millilitres);
-			}
-		} else if(fluid instanceof FluidMilk) {
-			newFluid = new FluidStored(charactersFluid==null?null:charactersFluid.getId(), ((FluidMilk)fluid), millilitres);
-		} else {
-			newFluid = new FluidStored(charactersFluid==null?null:charactersFluid.getId(), ((FluidGirlCum)fluid), millilitres);
-		}
-		
-		if(fluid.getType().getBaseType()==FluidTypeBase.CUM) {
-			if(Main.game.isInSex() && Main.sex.getAllParticipants().contains(this) && Main.sex.getAllParticipants().contains(charactersFluid)) {
-				Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.CUM);
-			}
-			
-			if(fluidsStoredMap.containsKey(orificeIngestedThrough) && charactersFluid!=null) {
-				for(FluidStored fluidStored : fluidsStoredMap.get(orificeIngestedThrough)) {
-					if(fluidStored.equals(newFluid)) {
-						fluidStored.incrementMillilitres(millilitres);
-						found = true;
-						break;
-					}
-				}
-			}
-			if(!found) {
-				this.addFluidStored(
-						orificeIngestedThrough,
-						new FluidStored(
-								charactersFluid==null?"":charactersFluid.getId(),
-								subspecies!=null?subspecies:charactersFluid.getSubspecies(),
-								charactersFluid==null?halfDemonSubspecies:charactersFluid.getHalfDemonSubspecies(),
-								(FluidCum)fluid, millilitres));
-			}
-			
-		} else if(fluid.getType().getBaseType()==FluidTypeBase.MILK) {
-			if(Main.game.isInSex()) {
-				Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.MILK);
-			}
-
-			if(fluidsStoredMap.containsKey(orificeIngestedThrough) && charactersFluid!=null) {
-				for(FluidStored fluidStored : fluidsStoredMap.get(orificeIngestedThrough)) {
-					if(fluidStored.equals(newFluid)) {
-						fluidStored.incrementMillilitres(millilitres);
-						found = true;
-						break;
-					}
-				}
-			}
-			if(!found) {
-				this.addFluidStored(orificeIngestedThrough, new FluidStored(charactersFluid==null?"":charactersFluid.getId(), (FluidMilk)fluid, millilitres));
-			}
-			
-		} else if(fluid.getType().getBaseType()==FluidTypeBase.GIRLCUM) {
-			if(Main.game.isInSex()) {
-				Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.GIRLCUM);
-			}
-
-			if(fluidsStoredMap.containsKey(orificeIngestedThrough) && charactersFluid!=null) {
-				for(FluidStored fluidStored : fluidsStoredMap.get(orificeIngestedThrough)) {
-					if(fluidStored.equals(newFluid)) {
-						fluidStored.incrementMillilitres(millilitres);
-						found = true;
-						break;
-					}
-				}
-			}
-			if(!found) {
-				this.addFluidStored(orificeIngestedThrough, new FluidStored(charactersFluid==null?"":charactersFluid.getId(), (FluidGirlCum)fluid, millilitres));
-			}
-		}
-		
-		fluidIngestionSB.append("<p style='padding:0; margin:0; text-align:center; color:"+fluid.getType().getBaseType().getColour().toWebHexString()+";'><i>");
-			switch(orificeIngestedThrough) {
-				case ANUS:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.asshole+]!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.asshole+]!"));
-					}
-					break;
-				case MOUTH:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, "[npc.Name] [npc.verb(swallow)] down "+Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+"!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, "[npc.Name] [npc.verb(swallow)] down "+Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+"!"));
-					}
-					break;
-				case NIPPLE:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.nipples+]!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.nipples+]!"));
-					}
-					break;
-				case NIPPLE_CROTCH:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.crotchNipples+]!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.crotchNipples+]!"));
-					}
-					break;
-				case URETHRA_PENIS:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.cockUrethra+]!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.cockUrethra+]!"));
-					}
-					break;
-				case URETHRA_VAGINA:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.pussyUrethra+]!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.pussyUrethra+]!"));
-					}
-					break;
-				case VAGINA:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.pussy+]!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] [npc.pussy+]!"));
-					}
-					break;
-				case SPINNERET:
-					if(charactersFluid!=null) {
-						fluidIngestionSB.append(UtilText.parse(this, charactersFluid, Units.fluid(millilitres)+" of [npc2.namePos] "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] spinneret!"));
-					} else {
-						fluidIngestionSB.append(UtilText.parse(this, Units.fluid(millilitres)+" of "+fluid.getName(charactersFluid)+" is pumped into [npc.namePos] spinneret!"));
-					}
-					break;
-				case ARMPITS:
-				case THIGHS:
-				case ASS:
-				case BREAST:
-				case BREAST_CROTCH:
-					break;
-			}
-		fluidIngestionSB.append("</i></p>");
-		
-		if((this.getBodyMaterial()==BodyMaterial.SLIME || orificeIngestedThrough == SexAreaOrifice.VAGINA)
-				&& fluid.getType().getBaseType()==FluidTypeBase.CUM) {
-			if(charactersFluid!=null) {
-				fluidIngestionSB.append(rollForPregnancy(charactersFluid, millilitres, Main.game.isInSex()));
-				
-			} else if(subspecies!=null) {
-				fluidIngestionSB.append(rollForPregnancy(subspecies, halfDemonSubspecies, millilitres, Main.game.isInSex()));
-			}
-		}
-		
-		for(FluidModifier mod : modifiers) {
-			String s = mod.applyEffects(this, charactersFluid, millilitres, fluid);
-//			System.out.println(s);
-			fluidIngestionSB.append(s);
-		}
-		
-		return fluidIngestionSB.toString();
+        FluidStored storedFluid = new FluidStored("", subspecies, halfDemonSubspecies, fluid, millilitres);
+        if(charactersFluid != null){
+            storedFluid = new FluidStored(charactersFluid.getId(), fluid, millilitres);
+        }
+		return ingestFluid(orificeIngestedThrough, Util.newArrayListOfValues(storedFluid));
 	}
 
     /**
@@ -18684,7 +18517,7 @@ public abstract class GameCharacter implements XMLSaving {
                 }
             }
         }
-        String list = Util.stringsToStringList((List<String>) fluidText.keySet(), true);
+        String list = Util.stringsToStringList(new ArrayList<>(fluidText.keySet()), true);
         fluidIngestionSB.append("<p style='padding:0; margin:0; text-align:center;'><i>");
 
         switch(orificeIngestedThrough) {

@@ -31,8 +31,6 @@ import java.util.Optional;
  * @author Innoxia
  */
 public class AbstractFilledBreastPump extends AbstractFluidContainerItem implements XMLSaving {
-	//COMPLETE OVERHAUL, replace everyhting with FluidStored
-	private List<FluidStored> storedFluids;
 
 	public AbstractFilledBreastPump(AbstractItemType itemType, Colour colour, List<FluidStored> fluids) {
 		super(itemType, colour, fluids);
@@ -132,43 +130,12 @@ public class AbstractFilledBreastPump extends AbstractFluidContainerItem impleme
 
 	@Override
 	public String applyEffect(GameCharacter user, GameCharacter target) {
-		if(storedFluids.size()>1){
-			float highestChance = 0;
-			boolean hasCum = false;
-			List<String> ingestString = new ArrayList<>();
-			String lastPregText = "";
-			for(FluidStored fluid : storedFluids){
-				if(fluid.getFluid().getType().getBaseType() == FluidTypeBase.CUM) hasCum = true;
-				String str = "";
-
-				if(ingestString.isEmpty()){
-					try{
-						GameCharacter character = fluid.getFluidCharacter();
-						str = UtilText.parse(target, character,
-								"<span style='padding:0; margin:0; text-align:center; color:"+fluid.getFluid().getType().getBaseType().getColour().toWebHexString()
-								+";'><i>[npc.Name] [npc.verb(swallow)] down "+Units.fluid(fluid.getMillilitres())
-								+" of [npc2.namePos] "+fluid.getFluid().getName(character) + "</i></span>");
-						if(hasCum)lastPregText = target.ingestFluid(fluid, SexAreaOrifice.MOUTH);
-					} catch (Exception ex) {}
-				} else {
-					try{
-						GameCharacter character = fluid.getFluidCharacter();
-						str = UtilText.parse(target,
-								character,
-								"<span style='padding:0; margin:0; text-align:center; color:"+fluid.getFluid().getType().getBaseType().getColour().toWebHexString()
-										+";'><i>" + Units.fluid(fluid.getMillilitres())+" of [npc2.namePos] "+fluid.getFluid().getName(character) + "</i></span>");
-						if(hasCum)lastPregText = target.ingestFluid(fluid, SexAreaOrifice.MOUTH);
-					} catch (Exception ex) {}}
-				ingestString.add(str);
-			}
-			ingestString.set(ingestString.size()-1, ingestString.get(ingestString.size()-1) + "</p>");
-			ingestString.set(ingestString.size()-1, ingestString.get(ingestString.size()-1) + "</i>");
-
-			target.addItem(Main.game.getItemGen().generateItem(ItemType.MOO_MILKER_EMPTY), false);
-			lastPregText = "<b" + lastPregText.split("<b")[1];
-			return Util.stringsToStringList(ingestString, false) + lastPregText;
-		}
-		return target.ingestFluid(storedFluids.get(0), SexAreaOrifice.MOUTH)
+		return UtilText.parse(target, user,
+		"<p>"
+				+ "[npc.Name] can't help but let out a delighted [npc.moan] as [npc.she] greedily [npc.verb(gulp)] down the slimy fluid."
+				+ " Darting [npc.her] [npc.tongue] out, [npc.she] desperately [npc.verb(lick)] up every last drop of cum; only discarding the condom once [npc.sheIs] sure that's it's completely empty."
+				+ "</p>")
+				+ target.ingestFluid(SexAreaOrifice.MOUTH, storedFluids)
 				+ target.addItem(Main.game.getItemGen().generateItem(ItemType.MOO_MILKER_EMPTY), false);
 	}
 
@@ -178,24 +145,6 @@ public class AbstractFilledBreastPump extends AbstractFluidContainerItem impleme
 
 	public float getMillilitresStored() {
 		return (float) storedFluids.stream().mapToDouble(FluidStored::getMillilitres).sum();
-	}
-
-	public void addFluid(FluidStored fluid) {
-		Optional<FluidStored> foundFluid = this.storedFluids.stream()
-				.filter(findFluid -> findFluid.getCharactersFluidID() == fluid.getCharactersFluidID()
-						&& findFluid.getFluid().equals(fluid.getFluid())
-						&& findFluid.getCumSubspecies() == fluid.getCumSubspecies()
-						&& findFluid.getCumHalfDemonSubspecies() == fluid.getCumHalfDemonSubspecies())
-				.findFirst();
-		if(foundFluid.isPresent()){
-			//averaging both virility values with fluid quantities e.g: F1 = 500ml v:50, F2 = 1200ml v:90 -> F3 = 1700ml v:78.235
-			foundFluid.get().setVirility(
-					foundFluid.get().getVirility() * (foundFluid.get().getMillilitres()/(foundFluid.get().getMillilitres() + fluid.getMillilitres()))
-					+ fluid.getVirility() * (fluid.getMillilitres()/(foundFluid.get().getMillilitres() + fluid.getMillilitres())));
-			foundFluid.get().setMillilitres(foundFluid.get().getMillilitres() + fluid.getMillilitres());
-
-		}
-		this.storedFluids.add(fluid);
 	}
 	
 }

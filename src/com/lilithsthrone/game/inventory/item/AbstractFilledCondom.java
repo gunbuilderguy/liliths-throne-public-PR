@@ -3,7 +3,7 @@ package com.lilithsthrone.game.inventory.item;
 import com.lilithsthrone.controller.xmlParsing.XMLUtil;
 import com.lilithsthrone.game.character.FluidStored;
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.FluidMilk;
+import com.lilithsthrone.game.character.body.FluidCum;
 import com.lilithsthrone.game.character.body.types.FluidType;
 import com.lilithsthrone.game.character.fetishes.Fetish;
 import com.lilithsthrone.game.dialogue.utils.UtilText;
@@ -28,7 +28,6 @@ import java.util.List;
  * @author Innoxia
  */
 public class AbstractFilledCondom extends AbstractFluidContainerItem implements XMLSaving {
-	//COMPLETE OVERHAUL, replace everyhting with FluidStored
 
 	public AbstractFilledCondom(AbstractItemType itemType, Colour colour, List<FluidStored> fluids) {
 		super(itemType, colour, fluids);
@@ -76,9 +75,9 @@ public class AbstractFilledCondom extends AbstractFluidContainerItem implements 
 		if(!provider.isEmpty()){ // if old save
 
 			FluidStored fluid = new FluidStored(provider,
-					((Element) parentElement.getElementsByTagName("milk").item(0)==null
-							?new FluidMilk(FluidType.MILK_HUMAN, false)
-							:FluidMilk.loadFromXML("milk", (Element) parentElement.getElementsByTagName("milk").item(0), doc)),
+					((Element) parentElement.getElementsByTagName("cum").item(0)==null
+							?new FluidCum(FluidType.CUM_HUMAN)
+							:FluidCum.loadFromXML((Element) parentElement.getElementsByTagName("cum").item(0), doc)),
 					(parentElement.getAttribute("millilitresStored").isEmpty()
 							?25
 							:Integer.valueOf(parentElement.getAttribute("millilitresStored"))));
@@ -127,50 +126,6 @@ public class AbstractFilledCondom extends AbstractFluidContainerItem implements 
 	@Override
 	public String applyEffect(GameCharacter user, GameCharacter target) {
 
-		/*if(storedFluids.size()>1){
-
-			List<String> ingestString = new ArrayList<>();
-			for(FluidStored fluid : storedFluids){
-				String str = "";
-				if(ingestString.isEmpty()){
-					str = target.ingestFluid(fluid, SexAreaOrifice.MOUTH);
-					str = str.replace("!","");
-					str = str.replace("</p>","");
-					str = str.replace("</i>","");
-				} else {
-					try{
-						GameCharacter character = fluid.getFluidCharacter();
-						str = UtilText.parse(target,
-								character,
-								"<span style='padding:0; margin:0; text-align:center; color:"+fluid.getFluid().getType().getBaseType().getColour().toWebHexString()
-										+";'><i>" + Units.fluid(fluid.getMillilitres())+" of [npc2.namePos] "+fluid.getFluid().getName(character) + "</i></span>");
-						target.ingestFluid(fluid, SexAreaOrifice.MOUTH);
-					} catch (Exception ex) {}}
-				ingestString.add(str);
-			}
-			ingestString.set(ingestString.size()-1, ingestString.get(ingestString.size()-1) + "</p>");
-			ingestString.set(ingestString.size()-1, ingestString.get(ingestString.size()-1) + "</i>");
-
-			target.addItem(Main.game.getItemGen().generateItem(ItemType.MOO_MILKER_EMPTY), false);
-
-			String fetishString = "";
-			if(target.hasFetish(Fetish.FETISH_CUM_ADDICT)) {
-				fetishString = UtilText.parse(target, user,
-						"<p>"
-								+ "[npc.Name] can't help but let out a delighted [npc.moan] as [npc.she] greedily [npc.verb(gulp)] down the slimy fluid."
-								+ " Darting [npc.her] [npc.tongue] out, [npc.she] desperately [npc.verb(lick)] up every last drop of cum; only discarding the condom once [npc.sheIs] sure that's it's completely empty."
-								+ "</p>");
-
-			} else {
-				fetishString = UtilText.parse(target, user,
-						"<p>"
-								+ "[npc.Name] [npc.verb(scrunch)] [npc.her] [npc.eyes] shut as [npc.she] [npc.verb(gulp)] down the slimy fluid,"
-								+ " trying [npc.her] best not to think about what [npc.sheHas] just done as "+(user.equals(target)?"[npc.she] [npc.verb(throw)]":"[npc2.name] [npc2.verb(throw)]")+" the now-empty condom to the floor..."
-								+ "</p>");
-			}
-
-			return fetishString + Util.stringsToStringList(ingestString, false);
-		}*/
 		if(target.hasFetish(Fetish.FETISH_CUM_ADDICT)) {
 			return UtilText.parse(target, user,
 					"<p>"

@@ -2755,10 +2755,10 @@ public class Sex {
 						stringBuilderForAppendingDescriptions.append(Main.game.getPlayer().addItem(
 								Main.game.getItemGen().generateFilledCondom(
 										Main.sex.getCharacterPerformingAction().getClothingInSlot(InventorySlot.PENIS).getClothingType().equals(ClothingType.getClothingTypeFromId("innoxia_penis_condom_webbing"))
-											?ItemType.CONDOM_USED_WEBBING
-											:ItemType.CONDOM_USED,
+												?ItemType.CONDOM_USED_WEBBING
+												:ItemType.CONDOM_USED,
 										Main.sex.getCharacterPerformingAction().getClothingInSlot(InventorySlot.PENIS).getColour(0),
-										Main.sex.getCharacterPerformingAction(), Main.sex.getCharacterPerformingAction().getCum(), Main.sex.getCharacterPerformingAction().getPenisRawOrgasmCumQuantity()),
+										new FluidStored(Main.sex.getCharacterPerformingAction(), Main.sex.getCharacterPerformingAction().getCum(), Main.sex.getCharacterPerformingAction().getPenisRawOrgasmCumQuantity())),
 								false, true));
 					}
 					Main.sex.stopAllOngoingActions(Main.sex.getCharacterPerformingAction(), SexAreaPenetration.PENIS);
