@@ -3,11 +3,15 @@ package com.lilithsthrone.game.inventory.item;
 import com.lilithsthrone.controller.xmlParsing.XMLUtil;
 import com.lilithsthrone.game.character.FluidStored;
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.FluidCum;
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.game.character.body.types.FluidType;
+import com.lilithsthrone.game.character.body.valueEnums.CumProduction;
+import com.lilithsthrone.game.character.body.valueEnums.FluidTypeBase;
 import com.lilithsthrone.game.character.fetishes.Fetish;
+import com.lilithsthrone.game.character.npc.dominion.Lilaya;
 import com.lilithsthrone.game.dialogue.utils.UtilText;
 import com.lilithsthrone.game.sex.SexAreaOrifice;
+import com.lilithsthrone.main.Main;
 import com.lilithsthrone.utils.SvgUtil;
 import com.lilithsthrone.utils.Util;
 import com.lilithsthrone.utils.XMLSaving;
@@ -76,8 +80,8 @@ public class AbstractFilledCondom extends AbstractFluidContainerItem implements 
 
 			FluidStored fluid = new FluidStored(provider,
 					((Element) parentElement.getElementsByTagName("cum").item(0)==null
-							?new FluidCum(FluidType.CUM_HUMAN)
-							:FluidCum.loadFromXML((Element) parentElement.getElementsByTagName("cum").item(0), doc)),
+							?new AbstractFluid(FluidType.CUM_HUMAN)
+							:AbstractFluid.loadFromXML((Element) parentElement.getElementsByTagName("cum").item(0), doc, null, "cum")),
 					(parentElement.getAttribute("millilitresStored").isEmpty()
 							?25
 							:Integer.valueOf(parentElement.getAttribute("millilitresStored"))));

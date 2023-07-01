@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lilithsthrone.game.dialogue.utils.UtilText;
 import com.lilithsthrone.main.Main;
 import org.w3c.dom.Document;
 
@@ -32,20 +33,39 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 	private String transformationName;
 	
 	private FluidTypeBase baseFluidType;
-	private FluidFlavour flavour;
+
+	/**
+	 * can be effectively overriden
+	 */
+	private FluidFlavour baseFlavour;
 	private AbstractRace race;
-	
+
+	private List<String> baseNames;
 	private List<String> namesMasculine;
 	private List<String> namesFeminine;
 	
 	private List<String> descriptorsMasculine;
 	private List<String> descriptorsFeminine;
-	
+
+	private String valuePerMl;
+
 	List<FluidModifier> defaultFluidModifiers;
-	
+
+	public AbstractFluidType(AbstractFluidType type) {
+		this.baseFluidType = type.baseFluidType;
+		this.baseFlavour = type.baseFlavour;
+		this.race = type.race;
+		this.transformationName = type.transformationName;
+		this.namesMasculine = type.namesMasculine;
+		this.namesFeminine = type.namesFeminine;
+		this.descriptorsMasculine = type.descriptorsMasculine;
+		this.descriptorsFeminine = type.descriptorsFeminine;
+		this.defaultFluidModifiers = type.defaultFluidModifiers;
+	}
+
 	/**
 	 * @param baseFluidType The base type of this fluid (milk, cum, or girlcum).
-	 * @param flavour The default flavour for this fluid.
+	 * @param baseFlavour The default flavour for this fluid.
 	 * @param race What race has this fluid type.
 	 * @param names A list of singular names for this fluid type.
 	 *  Pass in null to use generic names.
@@ -61,7 +81,7 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 	 */
 	public AbstractFluidType(
 			FluidTypeBase baseFluidType,
-			FluidFlavour flavour,
+			FluidFlavour baseFlavour,
 			AbstractRace race,
 			List<String> namesMasculine,
 			List<String> namesFeminine,
@@ -70,7 +90,7 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 			List<FluidModifier> defaultFluidModifiers) {
 		
 		this.baseFluidType = baseFluidType;
-		this.flavour = flavour;
+		this.baseFlavour = baseFlavour;
 		this.race = race;
 		
 		this.transformationName = null; // Use default race transformation name
@@ -82,6 +102,28 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 		this.descriptorsFeminine = descriptorsFeminine;
 		
 		this.defaultFluidModifiers = defaultFluidModifiers;
+	}
+	public AbstractFluidType(
+			FluidTypeBase baseFluidType,
+			FluidFlavour baseFlavour,
+			AbstractRace race,
+			List<String> namesMasculine,
+			List<String> namesFeminine,
+			List<String> descriptorsMasculine,
+			List<String> descriptorsFeminine,
+			List<FluidModifier> defaultFluidModifiers,
+			String valuePerMl) {
+
+		this.baseFluidType = baseFluidType;
+		this.baseFlavour = baseFlavour;
+		this.race = race;
+		this.transformationName = null;
+		this.namesMasculine = namesMasculine;
+		this.namesFeminine = namesFeminine;
+		this.descriptorsMasculine = descriptorsMasculine;
+		this.descriptorsFeminine = descriptorsFeminine;
+		this.defaultFluidModifiers = defaultFluidModifiers;
+		this.valuePerMl = valuePerMl;
 	}
 	
 	public AbstractFluidType(File XMLFile, String author, boolean mod) {
@@ -99,7 +141,7 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 				
 				this.race = Race.getRaceFromId(coreElement.getMandatoryFirstOf("race").getTextContent());
 				this.baseFluidType = FluidTypeBase.valueOf(coreElement.getMandatoryFirstOf("baseFluidType").getTextContent());
-				this.flavour = FluidFlavour.valueOf(coreElement.getMandatoryFirstOf("flavour").getTextContent());
+				this.baseFlavour = FluidFlavour.valueOf(coreElement.getMandatoryFirstOf("flavour").getTextContent());
 				
 				this.transformationName = coreElement.getMandatoryFirstOf("transformationName").getTextContent();
 				
@@ -133,7 +175,12 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 						defaultFluidModifiers.add(FluidModifier.valueOf(e.getTextContent()));
 					}
 				}
-				
+
+
+				if(coreElement.getOptionalFirstOf("valuePerMl").isPresent()) {
+					this.valuePerMl = coreElement.getMandatoryFirstOf("valuePerMl").getTextContent();
+				}
+
 			} catch(Exception ex) {
 				ex.printStackTrace();
 				System.err.println("AbstractFluidType was unable to be loaded from file! (" + XMLFile.getName() + ")\n" + ex);
@@ -230,16 +277,36 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 	public AbstractRace getRace() {
 		return race;
 	}
+
+	public List<String> getNames() {
+		return baseNames;
+	}
 	
 	public FluidTypeBase getBaseType() {
 		return baseFluidType;
 	}
 	
-	public FluidFlavour getFlavour() {
-		return flavour;
+	public FluidFlavour getBaseFlavour() {
+		return baseFlavour;
 	}
 	
 	public List<FluidModifier> getDefaultFluidModifiers() {
 		return defaultFluidModifiers;
+	}
+
+	public void setType(AbstractFluidType type) {
+		this.baseFluidType = type.baseFluidType;
+		this.baseFlavour = type.baseFlavour;
+		this.race = type.race;
+		this.transformationName = type.transformationName;
+		this.namesMasculine = type.namesMasculine;
+		this.namesFeminine = type.namesFeminine;
+		this.descriptorsMasculine = type.descriptorsMasculine;
+		this.descriptorsFeminine = type.descriptorsFeminine;
+		this.defaultFluidModifiers = type.defaultFluidModifiers;
+	}
+
+	public String getValuePerMlString(){
+		return valuePerMl;
 	}
 }

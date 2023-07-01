@@ -4,6 +4,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.game.character.body.valueEnums.*;
 import com.lilithsthrone.game.character.effects.Perk;
 import com.lilithsthrone.game.character.effects.PerkCategory;
@@ -16,7 +17,6 @@ import com.lilithsthrone.game.Game;
 import com.lilithsthrone.game.character.CharacterImportSetting;
 import com.lilithsthrone.game.character.EquipClothingSetting;
 import com.lilithsthrone.game.character.attributes.Attribute;
-import com.lilithsthrone.game.character.body.FluidCum;
 import com.lilithsthrone.game.character.body.Penis;
 import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
 import com.lilithsthrone.game.character.body.coverings.Covering;
@@ -294,10 +294,10 @@ public class RatWarrensCaptive extends NPC {
 			if(!Main.game.getPlayer().isCaptive() && !Main.game.getNpc(Murk.class).isSlave()) {
 				float rnd = (float) Math.random();
 				if(rnd<0.005f && Main.game.isAnalContentEnabled()) { // Average fucked once every week
-					this.ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new FluidCum(FluidType.CUM_RAT_MORPH), SexAreaOrifice.ANUS, 20+Util.random.nextInt(100));
+					this.ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new AbstractFluid(FluidType.CUM_RAT_MORPH), SexAreaOrifice.ANUS, 20+Util.random.nextInt(100));
 					
 				} else if(rnd<0.05f) { // Average fucked once or twice a day
-					this.ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new FluidCum(FluidType.CUM_RAT_MORPH), SexAreaOrifice.VAGINA, 20+Util.random.nextInt(100));
+					this.ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new AbstractFluid(FluidType.CUM_RAT_MORPH), SexAreaOrifice.VAGINA, 20+Util.random.nextInt(100));
 				}
 			}
 		}

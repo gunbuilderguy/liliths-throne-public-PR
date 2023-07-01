@@ -6,8 +6,6 @@ import java.util.Map.Entry;
 
 import com.lilithsthrone.game.character.FluidStored;
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.FluidCum;
-import com.lilithsthrone.game.character.body.FluidMilk;
 import com.lilithsthrone.game.combat.DamageType;
 import com.lilithsthrone.game.dialogue.eventLog.EventLogEntryEncyclopediaUnlock;
 import com.lilithsthrone.game.inventory.clothing.AbstractClothing;

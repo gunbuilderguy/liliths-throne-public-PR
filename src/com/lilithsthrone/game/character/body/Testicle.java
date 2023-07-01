@@ -38,7 +38,7 @@ public class Testicle implements BodyPartInterface {
 	protected int cumExpulsion;
 	protected boolean internal;
 	
-	protected FluidCum cum;
+	protected AbstractFluid cum;
 
 	public Testicle(AbstractTesticleType type, int testicleSize, int cumStorage, int testicleCount) {
 		this.type = type;
@@ -52,10 +52,10 @@ public class Testicle implements BodyPartInterface {
 		
 		internal = type.isInternal();
 		
-		cum = new FluidCum(type.getFluidType());
+		cum = new AbstractFluid(type.getFluidType());
 	}
 
-	public FluidCum getCum() {
+	public AbstractFluid getCum() {
 		return cum;
 	}
 

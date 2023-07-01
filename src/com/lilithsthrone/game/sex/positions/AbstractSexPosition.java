@@ -9,7 +9,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.BodyPartInterface;
+import com.lilithsthrone.game.character.body.*;
+import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.game.dialogue.utils.UtilText;
 import com.lilithsthrone.game.sex.OrgasmCumTarget;
 import com.lilithsthrone.game.sex.SexActionInteractions;
@@ -284,11 +286,11 @@ public abstract class AbstractSexPosition {
 	 * This is used in determining whether the 'leg-lock', 'tail-lock', 'tentacle-lock', or 'force creampie' actions (in the GenericOrgasms class) are available.
 	 * 
 	 * @param bodyPartUsed The body part which the cumTarget is using to force the creampie. Will almost certainly be either:<br/>
-	 * <b>{@link Arm.class}:</b> Always requires at least two free arms, and for arms to not be restricted.<br/>
-	 * <b>{@link Leg.class}:</b> Always requires at least two free legs, and for legs to not be restricted.<br/>
-	 * <b>{@link Tail.class}:</b> Requires tail(s), and for them to be prehensile.<br/>
-	 * <b>{@link Tentacle.class}:</b> Requires tentacle(s).<br/>
-	 * <b>{@link Skin.class}:</b> Used to represent the full body being used.
+	 * <b>{@link Arm}:</b> Always requires at least two free arms, and for arms to not be restricted.<br/>
+	 * <b>{@link Leg}:</b> Always requires at least two free legs, and for legs to not be restricted.<br/>
+	 * <b>{@link Tail}:</b> Requires tail(s), and for them to be prehensile.<br/>
+	 * <b>{@link Tentacle}:</b> Requires tentacle(s).<br/>
+	 * <b>{@link Body}:</b> Used to represent the full body being used.
 	 * @param orifice The orifice into which the creampie is to be forced.
 	 * @param cumTarget The character who is both receiving and forcing the creampie.
 	 * @param cumProvider The one who is being forced to cum inside the cumTarget.

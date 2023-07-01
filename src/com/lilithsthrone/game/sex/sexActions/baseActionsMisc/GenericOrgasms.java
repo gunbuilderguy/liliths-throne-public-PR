@@ -21,11 +21,7 @@ import com.lilithsthrone.game.character.body.Tail;
 import com.lilithsthrone.game.character.body.Tentacle;
 import com.lilithsthrone.game.character.body.Torso;
 import com.lilithsthrone.game.character.body.Wing;
-import com.lilithsthrone.game.character.body.valueEnums.CumProduction;
-import com.lilithsthrone.game.character.body.valueEnums.FluidModifier;
-import com.lilithsthrone.game.character.body.valueEnums.GenitalArrangement;
-import com.lilithsthrone.game.character.body.valueEnums.PenetrationModifier;
-import com.lilithsthrone.game.character.body.valueEnums.WingSize;
+import com.lilithsthrone.game.character.body.valueEnums.*;
 import com.lilithsthrone.game.character.effects.Perk;
 import com.lilithsthrone.game.character.effects.StatusEffect;
 import com.lilithsthrone.game.character.fetishes.AbstractFetish;
@@ -2124,7 +2120,7 @@ public class GenericOrgasms {
 			nakedAreas.addAll(getNakedAreasCummedOn(target, area));
 		}
 		nakedAreas = new ArrayList<>(new HashSet<>(nakedAreas));
-		
+
 		if(nakedAreas.isEmpty()) {
 			return UtilText.parse(characterOrgasming, target,
 					" all over [npc2.namePos] "+Util.clothesToStringList(clothing, false)+"."
@@ -2155,6 +2151,9 @@ public class GenericOrgasms {
 	}
 	
 	private static String getInflationText(GameCharacter characterOrgasming, GameCharacter target, float cumAmount) {
+		if(target.getBodyMaterial().equals(BodyMaterial.SLIME)){
+
+		}
 		if(characterOrgasming.isPlayer()) {
 			if(cumAmount >= CumProduction.SEVEN_MONSTROUS.getMaximumValue()) {
 				return ("<br/>You see [npc2.namePos] stomach swell out to a massive, over-inflated size as it distends from the colossal amount of cum that you've pumped inside of [npc2.herHim]."

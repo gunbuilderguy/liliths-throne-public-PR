@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.lilithsthrone.game.inventory.AbstractFluidStorage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -16,9 +17,6 @@ import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.attributes.AffectionLevel;
 import com.lilithsthrone.game.character.attributes.Attribute;
 import com.lilithsthrone.game.character.body.CoverableArea;
-import com.lilithsthrone.game.character.body.FluidCum;
-import com.lilithsthrone.game.character.body.FluidGirlCum;
-import com.lilithsthrone.game.character.body.FluidMilk;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractFluidType;
 import com.lilithsthrone.game.character.body.valueEnums.FluidFlavour;
 import com.lilithsthrone.game.character.body.valueEnums.FluidModifier;
@@ -51,7 +49,7 @@ public class MilkingRoom implements XMLSaving {
 	private AbstractWorldType worldType;
 	private Vector2i location;
 	
-	private List<FluidStored> fluidsStored;
+	private AbstractFluidStorage fluidsStored;
 	
 	private Map<String, List<AbstractClothing>> clothingRemovedForMilking = new HashMap<>();
 	
@@ -75,7 +73,7 @@ public class MilkingRoom implements XMLSaving {
 		this.worldType = worldType;
 		this.location = new Vector2i(location.getX(), location.getY());
 		
-		this.fluidsStored = new ArrayList<>();
+		this.fluidsStored = new AbstractFluidStorage();
 	}
 	
 	public Element saveAsXML(Element parentElement, Document doc) {
@@ -86,7 +84,7 @@ public class MilkingRoom implements XMLSaving {
 		XMLUtil.addAttribute(doc, element, "x", String.valueOf(this.getLocation().getX()));
 		XMLUtil.addAttribute(doc, element, "y", String.valueOf(this.getLocation().getY()));
 
-		for(FluidStored fluid : fluidsStored) {
+		for(FluidStored fluid : fluidsStored.getFluids()) {
 			fluid.saveAsXML(element, doc);
 		}
 		
@@ -119,27 +117,9 @@ public class MilkingRoom implements XMLSaving {
 				NodeList fluidStoredElements = parentElement.getElementsByTagName("fluidStored");
 				for(int i=0; i<fluidStoredElements.getLength(); i++){
 					Element fluidElement = (Element)fluidStoredElements.item(i);
-					room.getFluidsStored().add(FluidStored.loadFromXML(null, fluidElement, doc));
+					room.getFluidsStored().addFluid(FluidStored.loadFromXML(null, fluidElement, doc));
 				}
-			} catch(Exception ex) {
-			}
-
-			Map<FluidStored, Float> uniqueFluids = new HashMap<>();
-			
-			for(FluidStored fluid : room.getFluidsStored()) {
-				if(uniqueFluids.containsKey(fluid)) {
-					uniqueFluids.put(fluid, fluid.getMillilitres()+uniqueFluids.get(fluid));
-				} else {
-					uniqueFluids.put(fluid, fluid.getMillilitres());
-				}
-			}
-
-			room.fluidsStored = new ArrayList<>();
-			for(Entry<FluidStored, Float> entry : uniqueFluids.entrySet()) {
-				entry.getKey().setMillilitres(entry.getValue());
-				room.fluidsStored.add(entry.getKey());
-			}
-			
+			} catch(Exception ex) {}
 			
 			room.clothingRemovedForMilking = new HashMap<>();
 
@@ -370,33 +350,33 @@ public class MilkingRoom implements XMLSaving {
 		return location;
 	}
 
-	public List<FluidStored> getFluidsStored() {
+	public AbstractFluidStorage getFluidsStored() {
 		
 		return fluidsStored;
 	}
 
 	public List<FluidStored> getMilkFluidsStored() {
-		List<FluidStored> milkFluids = new ArrayList<>(fluidsStored);
+		List<FluidStored> milkFluids = new ArrayList<>(fluidsStored.getFluids());
 		milkFluids.removeIf((fluid)->!fluid.isMilk());
 		return milkFluids;
 	}
 
 	public List<FluidStored> getCumFluidsStored() {
-		List<FluidStored> cumFluids = new ArrayList<>(fluidsStored);
+		List<FluidStored> cumFluids = new ArrayList<>(fluidsStored.getFluids());
 		cumFluids.removeIf((fluid)->!fluid.isCum());
 		return cumFluids;
 	}
 
 	public List<FluidStored> getGirlcumFluidsStored() {
-		List<FluidStored> girlcumFluids = new ArrayList<>(fluidsStored);
-		girlcumFluids.removeIf((fluid)->!fluid.isGirlCum());
+		List<FluidStored> girlcumFluids = new ArrayList<>(fluidsStored.getFluids());
+		girlcumFluids.removeIf((fluid)->!fluid.isGirlcum());
 		return girlcumFluids;
 	}
 	
 	public void incrementFluidStored(FluidStored fluid, float millilitres) {
 		boolean fluidIncremented = false;
 		
-		for(FluidStored f : getFluidsStored()) {
+		for(FluidStored f : getFluidsStored().getFluids()) {
 			if(fluid.equals(f)) {
 				f.incrementMillilitres(millilitres);
 				fluidIncremented = true;
@@ -404,10 +384,9 @@ public class MilkingRoom implements XMLSaving {
 			}
 		}
 		if(!fluidIncremented) {
-			getFluidsStored().add(fluid);
+			getFluidsStored().addFluid(fluid);
 		}
-		
-		getFluidsStored().removeIf((fs) -> fs.getMillilitres()<=0);
+
 	}
 	
 	public Map<String, List<AbstractClothing>> getClothingRemovedForMilking() {
@@ -443,19 +422,16 @@ public class MilkingRoom implements XMLSaving {
 		
 			for(FluidStored fluid : fluids) {
 				String idModifier = "";
-				AbstractFluidType type = null;
+				AbstractFluidType type = fluid;
 				
 				if(fluid.isMilk()) {
 					idModifier = "MILK";
-					type = ((FluidMilk) fluid.getFluid()).getType();
 					
 				} else if(fluid.isCum()) {
 					idModifier = "CUM";
-					type = ((FluidCum) fluid.getFluid()).getType();
 					
-				} else if(fluid.isGirlCum()) {
+				} else if(fluid.isGirlcum()) {
 					idModifier = "GIRLCUM";
-					type = ((FluidGirlCum) fluid.getFluid()).getType();
 				}
 				
 				fluidsFound = true;
@@ -486,11 +462,11 @@ public class MilkingRoom implements XMLSaving {
 							+ "</div>");
 	
 					milkyMilknessSB.append("<div class='container-half-width' style='margin:0; padding:2px; width:35%; background:transparent;'>");
-					FluidFlavour flavour = fluid.getFluid().getFlavour();
+					FluidFlavour flavour = fluid.getFlavour();
 					milkyMilknessSB.append("<span style='color:"+flavour.getColour().toWebHexString()+";'>"+Util.capitaliseSentence(flavour.getName())+"-flavoured</span>.<br/>");
-						if(!fluid.getFluid().getFluidModifiers().isEmpty()) {
+						if(!fluid.getFluidModifiers().isEmpty()) {
 							int i=0;
-							for(FluidModifier mod : fluid.getFluid().getFluidModifiers()) {
+							for(FluidModifier mod : fluid.getFluidModifiers()) {
 								if(i>0) {
 									milkyMilknessSB.append(", ");
 								}
@@ -506,24 +482,24 @@ public class MilkingRoom implements XMLSaving {
 	
 					milkyMilknessSB.append(
 							"<div class='container-half-width' style='margin:0; padding:2px; width:10%; background:transparent;'>"
-								+ UtilText.formatAsMoney((int)(fluid.getMillilitres()*fluid.getFluid().getValuePerMl()), "span")
+								+ UtilText.formatAsMoney((int)(fluid.getMillilitres()*fluid.getValuePerMl()), "span")
 							+ "</div>");
 					
 					milkyMilknessSB.append("<div style='float:left; width:15%; margin:0 auto; padding:0; display:inline-block; text-align:center; background:transparent;'>"
 							+ "<div id='"+idModifier+"_"+CoverableArea.MOUTH+"_"+fluid.hashCode()+"' "
-									+(isAbleToIngestThroughArea(fluid.getFluid().getType().getBaseType(), getTargetedCharacter(), CoverableArea.MOUTH, fluid.getMillilitres())
+									+(isAbleToIngestThroughArea(fluid.getBaseType(), getTargetedCharacter(), CoverableArea.MOUTH, fluid.getMillilitres())
 											?"class='square-button big'"
 											:"class='square-button big disabled'")+">"
 									+ "<div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getCoverableAreaMouth()+"</div></div>");
 					
 					milkyMilknessSB.append("<div id='"+idModifier+"_"+CoverableArea.VAGINA+"_"+fluid.hashCode()+"' "
-									+(isAbleToIngestThroughArea(fluid.getFluid().getType().getBaseType(), getTargetedCharacter(), CoverableArea.VAGINA, fluid.getMillilitres())
+									+(isAbleToIngestThroughArea(fluid.getBaseType(), getTargetedCharacter(), CoverableArea.VAGINA, fluid.getMillilitres())
 											?"class='square-button big'"
 											:"class='square-button big disabled'")+">"
 									+ "<div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getCoverableAreaVagina()+"</div></div>");
 					
 					milkyMilknessSB.append("<div id='"+idModifier+"_"+CoverableArea.ANUS+"_"+fluid.hashCode()+"' "
-								+(isAbleToIngestThroughArea(fluid.getFluid().getType().getBaseType(), getTargetedCharacter(), CoverableArea.ANUS, fluid.getMillilitres())
+								+(isAbleToIngestThroughArea(fluid.getBaseType(), getTargetedCharacter(), CoverableArea.ANUS, fluid.getMillilitres())
 											?"class='square-button big'"
 											:"class='square-button big disabled'")+">"
 									+ "<div class='square-button-content'>"+SVGImages.SVG_IMAGE_PROVIDER.getCoverableAreaAnus()+"</div></div>");

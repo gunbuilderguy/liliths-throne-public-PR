@@ -42,7 +42,7 @@ public class BreastCrotch implements BodyPartInterface {
 	protected int nippleCountPerBreast;
 	
 	protected Nipples nipples;
-	protected FluidMilk milk;
+	protected AbstractFluid milk;
 	
 	public BreastCrotch(AbstractBreastType type, BreastShape shape, int size, int milkStorage, int rows,
 			int nippleSize, NippleShape nippleShape, int areolaeSize, AreolaeShape areolaeShape, int nippleCountPerBreast, float capacity, int depth, int elasticity, int plasticity, boolean virgin) {
@@ -57,7 +57,7 @@ public class BreastCrotch implements BodyPartInterface {
 		
 		nipples = new Nipples(type.getNippleType(), nippleSize, nippleShape, areolaeSize, areolaeShape, Lactation.getLactationFromInt(milkStorage).getAssociatedWetness().getValue(), capacity, depth, elasticity, plasticity, virgin, true);
 		
-		milk = new FluidMilk(type.getFluidType(), true);
+		milk = new AbstractFluid(type.getFluidType());
 	}
 	
 	@Override
@@ -111,7 +111,7 @@ public class BreastCrotch implements BodyPartInterface {
 		return nipples;
 	}
 
-	public FluidMilk getMilk() {
+	public AbstractFluid getMilk() {
 		return milk;
 	}
 	

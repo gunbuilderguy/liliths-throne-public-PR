@@ -17,24 +17,34 @@ public enum FluidTypeBase {
 	
 	CUM(Util.newArrayListOfValues("cum", "cream", "jism", "jizz", "seed", "spooge"),
 			BodyCoveringType.CUM,
-			PresetColour.CUM),
+			PresetColour.CUM,
+			0.1F),
 	
 	GIRLCUM(Util.newArrayListOfValues("girlcum"),
 			BodyCoveringType.GIRL_CUM,
-			PresetColour.GIRLCUM),
-	
+			PresetColour.GIRLCUM,
+			1F),
+
 	MILK(Util.newArrayListOfValues("milk"),
 			BodyCoveringType.MILK,
-			PresetColour.MILK);
+			PresetColour.MILK,
+			0.01F),
+
+	OTHER(Util.newArrayListOfValues("fluid"),
+			BodyCoveringType.MILK,
+			PresetColour.MILK,
+			0.1F);
 	
 	private List<String> names;
 	private AbstractBodyCoveringType coveringType;
 	private Colour colour;
+	private float baseValuePerMl;
 
-	private FluidTypeBase(List<String> names, AbstractBodyCoveringType coveringType, Colour colour) {
+	FluidTypeBase(List<String> names, AbstractBodyCoveringType coveringType, Colour colour, float baseValuePerMl) {
 		this.names = names;
 		this.coveringType = coveringType;
 		this.colour = colour;
+		this.baseValuePerMl = baseValuePerMl;
 	}
 
 	public List<String> getNames() {
@@ -47,5 +57,9 @@ public enum FluidTypeBase {
 
 	public Colour getColour() {
 		return colour;
+	}
+
+	public float getBaseValuePerMl(){
+		return baseValuePerMl;
 	}
 }

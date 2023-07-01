@@ -9,8 +9,8 @@ import java.util.Set;
 
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.attributes.CorruptionLevel;
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.game.character.body.CoverableArea;
-import com.lilithsthrone.game.character.body.FluidCum;
 import com.lilithsthrone.game.character.body.types.AntennaType;
 import com.lilithsthrone.game.character.body.types.ArmType;
 import com.lilithsthrone.game.character.body.types.AssType;
@@ -1222,7 +1222,7 @@ public class VengarCaptiveDialogue {
 								//TODO Test Silence gains creampie
 								Main.game.getNpc(Silence.class).calculateGenericSexEffects(
 										true, true, null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new SexType(SexParticipantType.NORMAL, SexAreaOrifice.VAGINA, SexAreaPenetration.PENIS));
-								Main.game.getNpc(Silence.class).ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new FluidCum(FluidType.CUM_RAT_MORPH), SexAreaOrifice.VAGINA, 400);
+								Main.game.getNpc(Silence.class).ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new AbstractFluid(FluidType.CUM_RAT_MORPH), SexAreaOrifice.VAGINA, 400);
 							}
 						};
 					}
@@ -1968,7 +1968,7 @@ public class VengarCaptiveDialogue {
 					@Override
 					public void effects() {
 						Main.game.getNpc(Silence.class).clearFluidsStored(SexAreaOrifice.VAGINA);
-						getMainCompanion().ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new FluidCum(FluidType.CUM_RAT_MORPH), SexAreaOrifice.MOUTH, 300);
+						getMainCompanion().ingestFluid(null, Subspecies.RAT_MORPH, Subspecies.RAT_MORPH, new AbstractFluid(FluidType.CUM_RAT_MORPH), SexAreaOrifice.MOUTH, 300);
 					}
 				};
 			}

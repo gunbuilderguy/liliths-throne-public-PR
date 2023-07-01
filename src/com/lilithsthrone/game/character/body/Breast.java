@@ -40,7 +40,7 @@ public class Breast implements BodyPartInterface {
 	protected int nippleCountPerBreast;
 	
 	protected Nipples nipples;
-	protected FluidMilk milk;
+	protected AbstractFluid milk;
 	
 	/**
 	 * @param size in inches from bust to underbust using the UK system.
@@ -59,7 +59,7 @@ public class Breast implements BodyPartInterface {
 		
 		nipples = new Nipples(type.getNippleType(), nippleSize, nippleShape, areolaeSize, areolaeShape, Lactation.getLactationFromInt(milkStorage).getAssociatedWetness().getValue(), capacity, depth, elasticity, plasticity, virgin, false);
 		
-		milk = new FluidMilk(type.getFluidType(), false);
+		milk = new AbstractFluid(type.getFluidType());
 	}
 	
 	@Override
@@ -101,7 +101,7 @@ public class Breast implements BodyPartInterface {
 		return nipples;
 	}
 
-	public FluidMilk getMilk() {
+	public AbstractFluid getMilk() {
 		return milk;
 	}
 	

@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.lilithsthrone.game.character.body.*;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -49,17 +50,7 @@ import com.lilithsthrone.game.character.attributes.IntelligenceLevel;
 import com.lilithsthrone.game.character.attributes.LustLevel;
 import com.lilithsthrone.game.character.attributes.ObedienceLevel;
 import com.lilithsthrone.game.character.attributes.ObedienceLevelBasic;
-import com.lilithsthrone.game.character.body.Arm;
-import com.lilithsthrone.game.character.body.Body;
-import com.lilithsthrone.game.character.body.BodyPartInterface;
-import com.lilithsthrone.game.character.body.CoverableArea;
-import com.lilithsthrone.game.character.body.FluidCum;
-import com.lilithsthrone.game.character.body.FluidGirlCum;
-import com.lilithsthrone.game.character.body.FluidInterface;
-import com.lilithsthrone.game.character.body.FluidMilk;
-import com.lilithsthrone.game.character.body.Penis;
-import com.lilithsthrone.game.character.body.Testicle;
-import com.lilithsthrone.game.character.body.Vagina;
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractAntennaType;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractArmType;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractAssType;
@@ -8436,7 +8427,7 @@ public abstract class GameCharacter implements XMLSaving {
 									ingestFluidSB.append(this.ingestFluid(null,
 											subspeciesBackup,
 											halfDemonSubspeciesBackup,
-											new FluidCum(body.getPenisType().getTesticleType().getFluidType()),
+											new AbstractFluid(body.getPenisType().getTesticleType().getFluidType()),
 											(SexAreaOrifice)performingArea,
 											(float) (body.getCumProduction()*(0.5+Math.random()))));
 								}
@@ -8972,7 +8963,7 @@ public abstract class GameCharacter implements XMLSaving {
 								this.ingestFluid(null,
 										subspeciesBackup,
 										halfDemonSubspeciesBackup,
-										new FluidGirlCum(body.getVaginaType().getFluidType()),
+										new AbstractFluid(body.getVaginaType().getFluidType()),
 										(SexAreaOrifice)performingArea,
 										(float) Math.max(5, Math.min(25, body.getVaginaWetness()*5)));
 							}
@@ -9009,7 +9000,7 @@ public abstract class GameCharacter implements XMLSaving {
 								this.ingestFluid(null,
 										subspeciesBackup,
 										halfDemonSubspeciesBackup,
-										new FluidCum(body.getBreastType().getFluidType()),
+										new AbstractFluid(body.getBreastType().getFluidType()),
 										(SexAreaOrifice)performingArea,
 										(float) Math.min(500, (body.getFemaleLactationRate()*(0.5+Math.random()))));
 							}
@@ -9046,7 +9037,7 @@ public abstract class GameCharacter implements XMLSaving {
 								this.ingestFluid(null,
 										subspeciesBackup,
 										halfDemonSubspeciesBackup,
-										new FluidCum(body.getBreastType().getFluidType()),
+										new AbstractFluid(body.getBreastType().getFluidType()),
 										(SexAreaOrifice)performingArea,
 										(float) Math.min(500, (body.getFemaleLactationRate()*(0.5+Math.random()))));
 							}
@@ -18331,7 +18322,7 @@ public abstract class GameCharacter implements XMLSaving {
 		} catch (Exception e) {
 			fluidOwner = null;
 		}
-		return ingestFluid(fluidOwner, fluid.getCumSubspecies(), fluid.getCumHalfDemonSubspecies(), fluid.getFluid(), orificeIngestedThrough, fluid.getMillilitres());
+		return ingestFluid(fluidOwner, fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, orificeIngestedThrough, fluid.getMillilitres());
 	}
 
 	public String ingestFluid(FluidStored fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
@@ -18341,27 +18332,15 @@ public abstract class GameCharacter implements XMLSaving {
 		} catch (Exception e) {
 			fluidOwner = null;
 		}
-		return ingestFluid(fluidOwner, fluid.getCumSubspecies(), fluid.getCumHalfDemonSubspecies(), fluid.getFluid(), orificeIngestedThrough, millilitres);
+		return ingestFluid(fluidOwner, fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, orificeIngestedThrough, millilitres);
 	}
 	
-	public String ingestFluid(GameCharacter charactersFluid, FluidInterface fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
+	public String ingestFluid(GameCharacter charactersFluid, AbstractFluid fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
 		return ingestFluid(charactersFluid, charactersFluid.getSubspecies(), charactersFluid.getHalfDemonSubspecies(), fluid, orificeIngestedThrough, millilitres);
 	}
 
 	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, AbstractFluidType fluidType, SexAreaOrifice orificeIngestedThrough, float millilitres) {
-		FluidInterface fluid = null;
-		switch(fluidType.getBaseType()) {
-			case CUM:
-				fluid = new FluidCum(fluidType);
-				break;
-			case GIRLCUM:
-				fluid = new FluidGirlCum(fluidType);
-				break;
-			case MILK:
-				fluid = new FluidMilk(fluidType, false);
-				break;
-		}
-		return ingestFluid(charactersFluid, subspecies, halfDemonSubspecies, fluid, orificeIngestedThrough, millilitres);
+		return ingestFluid(charactersFluid, subspecies, halfDemonSubspecies, new AbstractFluid(fluidType), orificeIngestedThrough, millilitres);
 	}
 	
 	/**
@@ -18370,7 +18349,7 @@ public abstract class GameCharacter implements XMLSaving {
 	 * @param addictive Is this fluid addictive or not.
 	 * @return A <b>formatted paragraph</b> description of addiction increasing/satisfied, or an empty String if no addictive effects occur.
 	 */
-	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, FluidInterface fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
+	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, AbstractFluid fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
         FluidStored storedFluid = new FluidStored("", subspecies, halfDemonSubspecies, fluid, millilitres);
         if(charactersFluid != null){
             storedFluid = new FluidStored(charactersFluid.getId(), fluid, millilitres);
@@ -18401,7 +18380,7 @@ public abstract class GameCharacter implements XMLSaving {
         }
 
         for(FluidStored fluid : fluids){
-            List<FluidModifier> modifiers = fluid.getFluid().getFluidModifiers();
+            List<FluidModifier> modifiers = fluid.getFluidModifiers();
             GameCharacter charactersFluid = null;
             float millilitres = fluid.getMillilitres();
             try {
@@ -18416,26 +18395,26 @@ public abstract class GameCharacter implements XMLSaving {
             }
 
             FluidStored newFluid = null;
-            switch(fluid.getFluid().getType().getBaseType()){
+            switch(fluid.getBaseType()){
                 case CUM:
                     if(charactersFluid == null){
-                        newFluid = new FluidStored("", fluid.getCumSubspecies(), fluid.getCumHalfDemonSubspecies(), fluid.getFluid(), millilitres);
+                        newFluid = new FluidStored("", fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, millilitres);
                         break;
                     }
                 case GIRLCUM:
                 case MILK:
-                    newFluid = new FluidStored(charactersFluid, fluid.getFluid(), millilitres);
+                    newFluid = new FluidStored(charactersFluid, fluid, millilitres);
                     break;
             }
 
             if(!this.getFluidsStoredInOrifice(orificeIngestedThrough).isEmpty() && charactersFluid!=null) {
                 for(FluidStored fluidStored : this.getFluidsStoredInOrifice(orificeIngestedThrough)) {
-                    if(fluidStored.getFluid() == newFluid.getFluid()
+                    if(((AbstractFluid)fluidStored).equals(newFluid)
                             && fluidStored.getCharactersFluidID() == newFluid.getCharactersFluidID()
                             && fluidStored.getVirility() == newFluid.getVirility()
                             && fluidStored.isFeral() == newFluid.isFeral()
-                            && fluidStored.getCumHalfDemonSubspecies() == newFluid.getCumHalfDemonSubspecies()
-                            && fluidStored.getCumSubspecies() == newFluid.getCumSubspecies()) {
+                            && fluidStored.getHalfDemonSubspecies() == newFluid.getHalfDemonSubspecies()
+                            && fluidStored.getSubspecies() == newFluid.getSubspecies()) {
                         fluidStored.incrementMillilitres(millilitres);
                         found = true;
                         break;
@@ -18448,11 +18427,11 @@ public abstract class GameCharacter implements XMLSaving {
                         orificeIngestedThrough,
                         new FluidStored(
                                 fluid.getCharactersFluidID(),
-                                fluid.getFluid(),
+                                fluid,
                                 millilitres));
             }
 
-            switch(fluid.getFluid().getType().getBaseType()){
+            switch(fluid.getBaseType()){
                 case CUM:
                     if(Main.game.isInSex() && Main.sex.getAllParticipants().contains(this) && Main.sex.getAllParticipants().contains(charactersFluid)) {
                         Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.CUM);
@@ -18471,34 +18450,34 @@ public abstract class GameCharacter implements XMLSaving {
             }
 
             if(charactersFluid == null){
-                Optional<String> find = fluidText.keySet().stream().filter(txt -> txt.contains(" of " + fluid.getFluid().getName(null))).findFirst();
+                Optional<String> find = fluidText.keySet().stream().filter(txt -> txt.contains(" of " + fluid.getName(null))).findFirst();
                 if(find.isPresent()){
                     String newString = find.get();
                     float oldQuantity = fluidText.get(newString);
                     fluidText.remove(newString);
-                    fluidText.put("<span style ='color:"+fluid.getFluid().getType().getBaseType().getColour().toWebHexString() + ";'>"
-                            + Units.fluid(millilitres+oldQuantity)+ " of " + fluid.getFluid().getName(null) + "</span>", millilitres+oldQuantity);
+                    fluidText.put("<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
+                            + Units.fluid(millilitres+oldQuantity)+ " of " + fluid.getName(null) + "</span>", millilitres+oldQuantity);
                 } else {
-                    fluidText.put("<span style ='color:"+fluid.getFluid().getType().getBaseType().getColour().toWebHexString() + ";'>"
-                            + Units.fluid(millilitres)+ " of " + fluid.getFluid().getName(null) + "</span>", millilitres);
+                    fluidText.put("<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
+                            + Units.fluid(millilitres)+ " of " + fluid.getName(null) + "</span>", millilitres);
                 }
             } else {
                 fluidText.put(
-                        "<span style ='color:"+fluid.getFluid().getType().getBaseType().getColour().toWebHexString() + ";'>"
+                        "<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
                                 + Units.fluid(millilitres, Units.UnitType.SHORT) + " of "
                                 + "<span style ='color:"+charactersFluid.getFemininity().getColour().toWebHexString() + ";'>"
                                 + (charactersFluid == this?"[npc.HerHis]":charactersFluid.getName()) + " </span>"
-                                + fluid.getFluid().getName(charactersFluid) + "</span>", millilitres);
+                                + fluid.getName(charactersFluid) + "</span>", millilitres);
             }
 
 
 
             for(FluidModifier mod : modifiers) {
-                String s = mod.applyEffects(this, charactersFluid, millilitres, fluid.getFluid());
+                String s = mod.applyEffects(this, charactersFluid, millilitres, fluid);
                 postSB.append(s);
             }
             //adding temporary transformations?
-            for(ItemEffect ie : fluid.getFluid().getTransformativeEffects()){
+            for(ItemEffect ie : fluid.getTransformativeEffects()){
                 //ideas on how to do that
                 //3 types: instant, over time and temporary
                 //store the current related bodypart(s) to be transformed, stored as an archive copy for when/if the transformation dissapears
@@ -18508,12 +18487,12 @@ public abstract class GameCharacter implements XMLSaving {
             }
 
             if((this.getBodyMaterial()==BodyMaterial.SLIME || orificeIngestedThrough == SexAreaOrifice.VAGINA)
-                    && fluid.getFluid().getType().getBaseType()==FluidTypeBase.CUM) {
+                    && fluid.getBaseType()==FluidTypeBase.CUM) {
                 if(charactersFluid!=null) {
                     postSB.append(rollForPregnancy(charactersFluid, millilitres, Main.game.isInSex()));
 
-                } else if(fluid.getCumSubspecies()!=null) {
-                    postSB.append(rollForPregnancy(fluid.getCumSubspecies(), fluid.getCumHalfDemonSubspecies(), millilitres, Main.game.isInSex()));
+                } else if(fluid.getSubspecies()!=null) {
+                    postSB.append(rollForPregnancy(fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), millilitres, Main.game.isInSex()));
                 }
             }
         }
@@ -19938,10 +19917,10 @@ public abstract class GameCharacter implements XMLSaving {
 	public void performHourlyFluidsCheck() {
 		for(Entry<SexAreaOrifice, List<FluidStored>> entry : this.fluidsStoredMap.entrySet()) {
 			for(FluidStored fs : entry.getValue()) {
-				if(fs.getFluid().getFluidModifiers().contains(FluidModifier.ADDICTIVE)) {
-					addAddiction(new Addiction(fs.getFluid().getType(), Main.game.getMinutesPassed(), fs.getCharactersFluidID()));
+				if(fs.getFluidModifiers().contains(FluidModifier.ADDICTIVE)) {
+					addAddiction(new Addiction(fs, Main.game.getMinutesPassed(), fs.getCharactersFluidID()));
 				}
-				if(fs.getFluid().getFluidModifiers().contains(FluidModifier.HALLUCINOGENIC)) {
+				if(fs.getFluidModifiers().contains(FluidModifier.HALLUCINOGENIC)) {
 					this.addStatusEffect(StatusEffect.PSYCHOACTIVE, 6*60*60);
 				}
 			}
@@ -20878,11 +20857,11 @@ public abstract class GameCharacter implements XMLSaving {
 			float drainAmount = Math.min(drain, f.getMillilitres());
 
 			if(f.isCum()) {
-				fluidsDrained.add(new FluidStored(f.getCharactersFluidID(), f.getCumSubspecies(), f.getCumHalfDemonSubspecies(), (FluidCum)f.getFluid(), Math.min(f.getMillilitres(), drainAmount)));
-			} else if(f.isGirlCum()) {
-				fluidsDrained.add(new FluidStored(f.getCharactersFluidID(), (FluidGirlCum)f.getFluid(), Math.min(f.getMillilitres(), drainAmount)));
+				fluidsDrained.add(new FluidStored(f.getCharactersFluidID(), f.getSubspecies(), f.getHalfDemonSubspecies(), f, Math.min(f.getMillilitres(), drainAmount)));
+			} else if(f.isGirlcum()) {
+				fluidsDrained.add(new FluidStored(f.getCharactersFluidID(), f, Math.min(f.getMillilitres(), drainAmount)));
 			} else if(f.isMilk()) {
-				fluidsDrained.add(new FluidStored(f.getCharactersFluidID(), (FluidMilk)f.getFluid(), Math.min(f.getMillilitres(), drainAmount)));
+				fluidsDrained.add(new FluidStored(f.getCharactersFluidID(), f, Math.min(f.getMillilitres(), drainAmount)));
 			}
 
 			f.incrementMillilitres(-drainAmount);
@@ -27451,11 +27430,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Milk:
-	public FluidMilk getMilk() {
+	public AbstractFluid getMilk() {
 		return body.getBreast().getMilk();
 	}
 	public AbstractFluidType getMilkType() {
-		return body.getBreast().getMilk().getType();
+		return body.getBreast().getMilk();
 	}
 	public String getMilkName() {
 		return body.getBreast().getMilk().getName(this);
@@ -27465,17 +27444,164 @@ public abstract class GameCharacter implements XMLSaving {
 		return body.getBreast().getMilk().getFlavour();
 	}
 	public String setMilkFlavour(FluidFlavour flavour) {
-		return body.getBreast().getMilk().setFlavour(this, flavour);
+
+        if(body.getBreast().getMilk().getFlavour() == flavour) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getBreast().getMilk().setFlavour(flavour);
+
+        return UtilText.parse(this,
+                "<p>"
+                        + "A soothing warmth spreads through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a contented little sigh.<br/>"
+                        + "[npc.NamePos] [npc.milk] now tastes of <b style='color:"+flavour.getColour().toWebHexString()+";'>"+flavour.getName()+"</b>."
+                        + "</p>");
 	}
 	// Modifiers:
 	public boolean hasMilkModifier(FluidModifier fluidModifier) {
 		return body.getBreast().getMilk().hasFluidModifier(fluidModifier);
 	}
 	public String addMilkModifier(FluidModifier fluidModifier) {
-		return body.getBreast().getMilk().addFluidModifier(this, fluidModifier);
-	}
-	public String removeMilkModifier(FluidModifier fluidModifier) {
-		return body.getBreast().getMilk().removeFluidModifier(this, fluidModifier);
+        if(body.getBreast().getMilk().getFluidModifiers().contains(fluidModifier)) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getBreast().getMilk().getFluidModifiers().add(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, pulsating heat spreads through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+                body.getBreast().getMilk().getFluidModifiers().remove(FluidModifier.ALCOHOLIC_WEAK);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth spreads up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(strongly alcoholic)]!"
+                                + "</p>");
+            case ALCOHOLIC_WEAK:
+                body.getBreast().getMilk().getFluidModifiers().remove(FluidModifier.ALCOHOLIC);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth spreads up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A light, bubbly feeling spreads up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of strange pulses shoot up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(psychoactive)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soothing warmth flows into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now imbued with [style.boldGrow(mineral oil)], and can melt condoms!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A slow, creeping warmth rises up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth flows up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A thick, sickly warmth flows up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A heavy heat slowly rises up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.milk] is now [style.boldGrow(viscous)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+    }
+
+    public String removeMilkModifier(FluidModifier fluidModifier) {
+        if(!body.getBreast().getMilk().getFluidModifiers().contains(fluidModifier)) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getBreast().getMilk().getFluidModifiers().remove(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                    return UtilText.parse(this,
+                            "<p>"
+                                    + "A soft coolness spreads up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                    + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer addictive)]!"
+                                    + "</p>");
+            case ALCOHOLIC:
+            case ALCOHOLIC_WEAK:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calm, settling feeling spreads up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of soothing waves wash up through [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer psychoactive)]!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A gentle coolness rises up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a soft sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calming coolness flows up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft warmth flows up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness rises up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer viscous)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A short relief flows up into [npc.namePos] [npc.breasts], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.milk] is [style.boldShrink(no longer mineral oil)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
 	}
 	public void clearMilkModifiers() {
 		body.getBreast().getMilk().clearFluidModifiers();
@@ -27823,11 +27949,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Milk:
-	public FluidMilk getMilkCrotch() {
+	public AbstractFluid getMilkCrotch() {
 		return body.getBreastCrotch().getMilk();
 	}
 	public AbstractFluidType getMilkCrotchType() {
-		return body.getBreastCrotch().getMilk().getType();
+		return body.getBreastCrotch().getMilk();
 	}
 	public String getMilkCrotchName() {
 		return body.getBreastCrotch().getMilk().getName(this);
@@ -27837,17 +27963,163 @@ public abstract class GameCharacter implements XMLSaving {
 		return body.getBreastCrotch().getMilk().getFlavour();
 	}
 	public String setMilkCrotchFlavour(FluidFlavour flavour) {
-		return body.getBreastCrotch().getMilk().setFlavour(this, flavour);
+
+        if(body.getBreastCrotch().getMilk().getFlavour() == flavour) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getBreastCrotch().getMilk().setFlavour(flavour);
+
+        return UtilText.parse(this,
+                "<p>"
+                        + "A soothing warmth spreads through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a contented little sigh.<br/>"
+                        + "[npc.NamePos] [npc.crotchMilk] now tastes of <b style='color:"+flavour.getColour().toWebHexString()+";'>"+flavour.getName()+"</b>."
+                        + "</p>");
 	}
 	// Modifiers:
 	public boolean hasMilkCrotchModifier(FluidModifier fluidModifier) {
 		return body.getBreastCrotch().getMilk().hasFluidModifier(fluidModifier);
 	}
 	public String addMilkCrotchModifier(FluidModifier fluidModifier) {
-		return body.getBreastCrotch().getMilk().addFluidModifier(this, fluidModifier);
-	}
-	public String removeMilkCrotchModifier(FluidModifier fluidModifier) {
-		return body.getBreastCrotch().getMilk().removeFluidModifier(this, fluidModifier);
+        if(body.getBreastCrotch().getMilk().getFluidModifiers().contains(fluidModifier)) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getBreastCrotch().getMilk().getFluidModifiers().add(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, pulsating heat spreads through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+                body.getBreastCrotch().getMilk().getFluidModifiers().remove(FluidModifier.ALCOHOLIC_WEAK);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth spreads up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(strongly alcoholic)]!"
+                                + "</p>");
+            case ALCOHOLIC_WEAK:
+                body.getBreastCrotch().getMilk().getFluidModifiers().remove(FluidModifier.ALCOHOLIC);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth spreads up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A light, bubbly feeling spreads up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of strange pulses shoot up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(psychoactive)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soothing warmth flows into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now imbued with [style.boldGrow(mineral oil)], and can melt condoms!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A slow, creeping warmth rises up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth flows up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A thick, sickly warmth flows up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A heavy heat slowly rises up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is now [style.boldGrow(viscous)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+    }
+
+    public String removeMilkCrotchModifier(FluidModifier fluidModifier) {
+        if(!body.getBreastCrotch().getMilk().getFluidModifiers().contains(fluidModifier)) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getBreastCrotch().getMilk().getFluidModifiers().remove(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+            case ALCOHOLIC_WEAK:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calm, settling feeling spreads up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of soothing waves wash up through [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer psychoactive)]!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A gentle coolness rises up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a soft sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calming coolness flows up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft warmth flows up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness rises up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer viscous)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A short relief flows up into [npc.namePos] [npc.crotchBoobs], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.crotchMilk] is [style.boldShrink(no longer mineral oil)]!"
+                                + "</p>");
+        }
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
 	}
 	public void clearMilkCrotchModifiers() {
 		body.getBreastCrotch().getMilk().clearFluidModifiers();
@@ -29494,11 +29766,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Cum:
-	public FluidCum getCum() {
+	public AbstractFluid getCum() {
 		return getCurrentPenis().getTesticle().getCum();
 	}
 	public AbstractFluidType getCumType() {
-		return getCurrentPenis().getTesticle().getCum().getType();
+		return getCurrentPenis().getTesticle().getCum();
 	}
 	public String getCumName() {
 		return getCurrentPenis().getTesticle().getCum().getName(this);
@@ -29508,7 +29780,18 @@ public abstract class GameCharacter implements XMLSaving {
 		return getCurrentPenis().getTesticle().getCum().getFlavour();
 	}
 	public String setCumFlavour(FluidFlavour flavour) {
-		return getCurrentPenis().getTesticle().getCum().setFlavour(this, flavour);
+
+        if(getCurrentPenis().getTesticle().getCum().getFlavour() == flavour || !hasPenis()) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        getCurrentPenis().getTesticle().getCum().setFlavour(flavour);
+
+        return UtilText.parse(this,
+                "<p>"
+                        + "A soothing warmth spreads down into [npc.namePos] [npc.balls+], causing [npc.herHim] to let out an involuntary [npc.moan].<br/>"
+                        + "[npc.NamePos] [npc.cum] now tastes of <b style='color:"+flavour.getColour().toWebHexString()+";'>"+flavour.getName()+"</b>."
+                        + "</p>");
 	}
 	// Modifiers:
 	public List<FluidModifier> getCumModifiers() {
@@ -29519,12 +29802,149 @@ public abstract class GameCharacter implements XMLSaving {
 	public boolean hasCumModifier(FluidModifier fluidModifier) {
 		return getCurrentPenis().getTesticle().getCum().hasFluidModifier(fluidModifier);
 	}
-	public String addCumModifier(FluidModifier fluidModifier) {
-		return getCurrentPenis().getTesticle().getCum().addFluidModifier(this, fluidModifier);
-	}
-	public String removeCumModifier(FluidModifier fluidModifier) {
-		return getCurrentPenis().getTesticle().getCum().removeFluidModifier(this, fluidModifier);
-	}
+
+    public String addCumModifier(FluidModifier fluidModifier) {
+        if(getCurrentPenis().getTesticle().getCum().getFluidModifiers().contains(fluidModifier) || !hasPenis()) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        getCurrentPenis().getTesticle().getCum().getFluidModifiers().add(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, pulsating heat takes root deep within [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+                getCurrentPenis().getTesticle().getCum().getFluidModifiers().remove(FluidModifier.ALCOHOLIC_WEAK);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth takes root deep within [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(strongly alcoholic)]!"
+                                + "</p>");
+            case ALCOHOLIC_WEAK:
+                getCurrentPenis().getTesticle().getCum().getFluidModifiers().remove(FluidModifier.ALCOHOLIC);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth takes root deep within [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A light, bubbly feeling rises up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of strange pulses shoot down into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(psychoactive)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soothing warmth flows into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now imbued with [style.boldGrow(mineral oil)], and can melt condoms!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A slow, creeping warmth rises up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth flows up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A thick, sickly warmth flows up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A heavy heat slowly rises up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.cum] is now [style.boldGrow(viscous)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+    }
+
+    public String removeCumModifier(FluidModifier fluidModifier) {
+        if(!getCurrentPenis().getTesticle().getCum().getFluidModifiers().contains(fluidModifier) || !hasPenis()) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        getCurrentPenis().getTesticle().getCum().getFluidModifiers().remove(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+            case ALCOHOLIC_WEAK:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calm, settling feeling spreads up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of soothing waves wash up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer psychoactive)]!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A gentle coolness rises up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a soft sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calming coolness flows up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft warmth flows up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness rises up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer viscous)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A short relief flows up into [npc.namePos] [npc.balls], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.cum] is [style.boldShrink(no longer mineral oil)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+    }
 	// Transformations:
 	public List<ItemEffect> getCumTransformativeEffects() {
 		return getCurrentPenis().getTesticle().getCum().getTransformativeEffects();
@@ -30328,11 +30748,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Girlcum:
-	public FluidGirlCum getGirlcum() {
+	public AbstractFluid getGirlcum() {
 		return body.getVagina().getGirlcum();
 	}
 	public AbstractFluidType getGirlcumType() {
-		return body.getVagina().getGirlcum().getType();
+		return body.getVagina().getGirlcum();
 	}
 	public String getGirlcumName() {
 		return body.getVagina().getGirlcum().getName(this);
@@ -30342,17 +30762,159 @@ public abstract class GameCharacter implements XMLSaving {
 		return body.getVagina().getGirlcum().getFlavour();
 	}
 	public String setGirlcumFlavour(FluidFlavour flavour) {
-		return body.getVagina().getGirlcum().setFlavour(this, flavour);
+        if(body.getVagina().getGirlcum().getFlavour() == flavour || !hasVagina()) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getVagina().getGirlcum().setFlavour(flavour);
+
+        return UtilText.parse(this,
+                "<p>"
+                        + "A soothing warmth spreads down into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out an involuntary [npc.moan].<br/>"
+                        + "[npc.NamePos] [pc.girlcum] now tastes of <b style='color:"+flavour.getColour().toWebHexString()+";'>"+flavour.getName()+"</b>."
+                        + "</p>");
 	}
 	// Modifiers:
 	public boolean hasGirlcumModifier(FluidModifier fluidModifier) {
 		return body.getVagina().getGirlcum().hasFluidModifier(fluidModifier);
 	}
 	public String addGirlcumModifier(FluidModifier fluidModifier) {
-		return body.getVagina().getGirlcum().addFluidModifier(this, fluidModifier);
-	}
-	public String removeGirlcumModifier(FluidModifier fluidModifier) {
-		return body.getVagina().getGirlcum().removeFluidModifier(this, fluidModifier);
+        if(body.getVagina().getGirlcum().getFluidModifiers().contains(fluidModifier) || !hasVagina()) {
+            return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+        }
+
+        body.getVagina().getGirlcum().getFluidModifiers().add(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, pulsating heat takes root deep within [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+                body.getVagina().getGirlcum().getFluidModifiers().remove(FluidModifier.ALCOHOLIC_WEAK);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth takes root deep within [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(strongly alcoholic)]!"
+                                + "</p>");
+            case ALCOHOLIC_WEAK:
+                body.getVagina().getGirlcum().getFluidModifiers().remove(FluidModifier.ALCOHOLIC);
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth takes root deep within [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A light, bubbly feeling rises up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of strange pulses shoot down into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(psychoactive)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soothing warmth flows into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now imbued with [style.boldGrow(mineral oil)], and can melt condoms!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A slow, creeping warmth rises up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A strange, soothing warmth flows up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A thick, sickly warmth flows up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A heavy heat slowly rises up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out [npc.a_moan+].<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is now [style.boldGrow(viscous)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
+    }
+
+    public String removeGirlcumModifier(FluidModifier fluidModifier) {
+        body.getVagina().getGirlcum().getFluidModifiers().remove(fluidModifier);
+
+        switch(fluidModifier) {
+            case ADDICTIVE:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer addictive)]!"
+                                + "</p>");
+            case ALCOHOLIC:
+            case ALCOHOLIC_WEAK:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness spreads up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer alcoholic)]!"
+                                + "</p>");
+            case BUBBLING:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calm, settling feeling spreads up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer bubbly)]!"
+                                + "</p>");
+            case HALLUCINOGENIC:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A series of soothing waves wash up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer psychoactive)]!"
+                                + "</p>");
+            case MUSKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A gentle coolness rises up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a soft sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer musky)]!"
+                                + "</p>");
+            case SLIMY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A calming coolness flows up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer slimy)]!"
+                                + "</p>");
+            case STICKY:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft warmth flows up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer sticky)]!"
+                                + "</p>");
+            case VISCOUS:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A soft coolness rises up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer viscous)]!"
+                                + "</p>");
+            case MINERAL_OIL:
+                return UtilText.parse(this,
+                        "<p>"
+                                + "A short relief flows up into [npc.namePos] [npc.pussy], causing [npc.herHim] to let out a gentle sigh.<br/>"
+                                + "[npc.NamePos] [npc.girlcum] is [style.boldShrink(no longer mineral oil)]!"
+                                + "</p>");
+        }
+
+        return "<p style='text-align:center;'>[style.colourDisabled(Nothing happens...)]</p>";
 	}
 	// Transformations:
 	public List<ItemEffect> getGirlcumTransformativeEffects() {

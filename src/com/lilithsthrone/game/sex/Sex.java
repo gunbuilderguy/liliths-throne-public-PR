@@ -3724,7 +3724,7 @@ public class Sex {
 									+ "</i></p>"
 									+ characterPenetrating.ingestFluid(
 											fluidCharacter,
-											fluid.getFluid(),
+											fluid,
 											SexAreaOrifice.MOUTH,
 											fluid.getMillilitres()));
 						} catch(Exception ex) {
@@ -3735,9 +3735,9 @@ public class Sex {
 										+ "</i></p>"
 										+ characterPenetrating.ingestFluid(
 												null,
-												fluid.getCumSubspecies(),
-												fluid.getCumHalfDemonSubspecies(),
-												fluid.getFluid(),
+												fluid.getSubspecies(),
+												fluid.getHalfDemonSubspecies(),
+												fluid,
 												SexAreaOrifice.MOUTH,
 												fluid.getMillilitres()));
 							} else {

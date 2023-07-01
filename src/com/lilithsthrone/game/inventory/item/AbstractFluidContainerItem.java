@@ -2,6 +2,7 @@ package com.lilithsthrone.game.inventory.item;
 
 import com.lilithsthrone.controller.xmlParsing.XMLUtil;
 import com.lilithsthrone.game.character.FluidStored;
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.utils.SvgUtil;
 import com.lilithsthrone.utils.Util;
 import com.lilithsthrone.utils.XMLSaving;
@@ -23,7 +24,6 @@ import java.util.Optional;
  * @author Innoxia
  */
 public class AbstractFluidContainerItem extends AbstractItem implements XMLSaving {
-	//COMPLETE OVERHAUL, replace everyhting with FluidStored
 	protected List<FluidStored> storedFluids;
 
 	public AbstractFluidContainerItem(AbstractItemType itemType, Colour colour, List<FluidStored> fluids) {
@@ -114,9 +114,9 @@ public class AbstractFluidContainerItem extends AbstractItem implements XMLSavin
 	public void addFluid(FluidStored fluid) {
 		Optional<FluidStored> foundFluid = this.storedFluids.stream()
 				.filter(findFluid -> findFluid.getCharactersFluidID() == fluid.getCharactersFluidID()
-						&& findFluid.getFluid().equals(fluid.getFluid())
-						&& findFluid.getCumSubspecies() == fluid.getCumSubspecies()
-						&& findFluid.getCumHalfDemonSubspecies() == fluid.getCumHalfDemonSubspecies())
+						&& ((AbstractFluid)fluid).equals(findFluid)
+						&& findFluid.getSubspecies() == fluid.getSubspecies()
+						&& findFluid.getHalfDemonSubspecies() == fluid.getHalfDemonSubspecies())
 				.findFirst();
 		if(foundFluid.isPresent()){
 			//averaging both virility values with fluid quantities e.g: F1 = 500ml v:50, F2 = 1200ml v:90 -> F3 = 1700ml v:78.235

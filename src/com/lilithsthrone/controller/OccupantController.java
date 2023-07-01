@@ -175,7 +175,7 @@ public class OccupantController {
 		String idModifier = "MILK";
 		if (fluid.isCum()) {
 			idModifier = "CUM";
-		} else if (fluid.isGirlCum()) {
+		} else if (fluid.isGirlcum()) {
 			idModifier = "GIRLCUM";
 		}
 		GameCharacter fluidOwner;
@@ -185,7 +185,7 @@ public class OccupantController {
 			fluidOwner = null;
 		}
 		
-		String fluidName = fluid.getFluid().getName(fluidOwner);
+		String fluidName = fluid.getName(fluidOwner);
 		
 		Map<CoverableArea, SexAreaOrifice> areas = Util.newHashMapOfValues(
 				new Util.Value<>(CoverableArea.MOUTH, SexAreaOrifice.MOUTH),
@@ -196,7 +196,7 @@ public class OccupantController {
 			String id = idModifier+"_"+area.getKey()+"_"+fluid.hashCode();
 			if (MainController.document.getElementById(id) != null) {
 				float milkAmount = Math.min(fluid.getMillilitres(), MilkingRoom.INGESTION_AMOUNT);
-				boolean canIngest = room.isAbleToIngestThroughArea(fluid.getFluid().getType().getBaseType(), MilkingRoom.getTargetedCharacter(), area.getKey(), milkAmount);
+				boolean canIngest = room.isAbleToIngestThroughArea(fluid.getBaseType(), MilkingRoom.getTargetedCharacter(), area.getKey(), milkAmount);
 				
 				String fluidOwnerName = fluidOwner == null
 						?"the"
@@ -285,7 +285,7 @@ public class OccupantController {
 						String ingestion;
 						try {
 							GameCharacter c = fluid.getFluidCharacter();
-							ingestion = MilkingRoom.getTargetedCharacter().ingestFluid(c, fluid.getFluid(), area.getValue(), milkAmount);
+							ingestion = MilkingRoom.getTargetedCharacter().ingestFluid(c, fluid, area.getValue(), milkAmount);
 						} catch (Exception e1) {
 							ingestion = MilkingRoom.getTargetedCharacter().ingestFluid(fluid, area.getValue(), milkAmount);
 						}
@@ -330,7 +330,7 @@ public class OccupantController {
 							description);
 				} else {
 					el = new TooltipInformationEventListener().setInformation(verb+" ("+Units.fluid(milkAmount)+")",
-							room.getAreaIngestionBlockedDescription(fluid.getFluid().getType().getBaseType(), MilkingRoom.getTargetedCharacter(), area.getKey(), milkAmount));
+							room.getAreaIngestionBlockedDescription(fluid.getBaseType(), MilkingRoom.getTargetedCharacter(), area.getKey(), milkAmount));
 				}
 				MainController.addTooltipListeners(id, el);
 			}
@@ -339,14 +339,14 @@ public class OccupantController {
 		String id = idModifier+"_SELL_"+fluid.hashCode();
 		if (MainController.document.getElementById(id) != null) {
 			((EventTarget) MainController.document.getElementById(id)).addEventListener("click", e->{
-				int income = Math.max(1, (int) (fluid.getFluid().getValuePerMl()*fluid.getMillilitres()));
+				int income = Math.max(1, (int) (fluid.getValuePerMl()*fluid.getMillilitres()));
 				Main.game.getPlayer().incrementMoney(income);
-				room.getFluidsStored().remove(fluid);
+				room.getFluidsStored().removeFluid(fluid);
 				Main.game.getTextEndStringBuilder().append("<p style='text-align:center;'>You sold the "+fluidName+" for "+(UtilText.formatAsMoney(income, "span"))+"!</p>");
 				Main.game.setContent(new Response("", "", Main.game.getCurrentDialogueNode()));
 			}, false);
 			MainController.addTooltipListeners(id,
-					new TooltipInformationEventListener().setInformation("Sell", "Sell all of the "+fluidName+" for "+(Math.max(1, (int) (fluid.getFluid().getValuePerMl()*fluid.getMillilitres())))+" flames."));
+					new TooltipInformationEventListener().setInformation("Sell", "Sell all of the "+fluidName+" for "+(Math.max(1, (int) (fluid.getValuePerMl()*fluid.getMillilitres())))+" flames."));
 		}
 	}
 	

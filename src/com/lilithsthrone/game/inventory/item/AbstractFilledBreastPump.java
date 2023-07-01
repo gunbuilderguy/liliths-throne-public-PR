@@ -3,14 +3,12 @@ package com.lilithsthrone.game.inventory.item;
 import com.lilithsthrone.controller.xmlParsing.XMLUtil;
 import com.lilithsthrone.game.character.FluidStored;
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.FluidMilk;
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.game.character.body.types.FluidType;
-import com.lilithsthrone.game.character.body.valueEnums.FluidTypeBase;
 import com.lilithsthrone.game.dialogue.utils.UtilText;
 import com.lilithsthrone.game.sex.SexAreaOrifice;
 import com.lilithsthrone.main.Main;
 import com.lilithsthrone.utils.SvgUtil;
-import com.lilithsthrone.utils.Units;
 import com.lilithsthrone.utils.Util;
 import com.lilithsthrone.utils.XMLSaving;
 import com.lilithsthrone.utils.colours.Colour;
@@ -23,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @since 0.2.1
@@ -82,8 +79,8 @@ public class AbstractFilledBreastPump extends AbstractFluidContainerItem impleme
 
 			FluidStored fluid = new FluidStored(provider,
 					((Element) parentElement.getElementsByTagName("milk").item(0)==null
-							?new FluidMilk(FluidType.MILK_HUMAN, false)
-							:FluidMilk.loadFromXML("milk", (Element) parentElement.getElementsByTagName("milk").item(0), doc)),
+							?new AbstractFluid(FluidType.MILK_HUMAN)
+							:AbstractFluid.loadFromXML((Element) parentElement.getElementsByTagName("milk").item(0), doc, null, "milk")),
 					(parentElement.getAttribute("millilitresStored").isEmpty()
 							?25
 							:Integer.valueOf(parentElement.getAttribute("millilitresStored"))));
@@ -131,12 +128,8 @@ public class AbstractFilledBreastPump extends AbstractFluidContainerItem impleme
 	@Override
 	public String applyEffect(GameCharacter user, GameCharacter target) {
 		return UtilText.parse(target, user,
-		"<p>"
-				+ "[npc.Name] can't help but let out a delighted [npc.moan] as [npc.she] greedily [npc.verb(gulp)] down the slimy fluid."
-				+ " Darting [npc.her] [npc.tongue] out, [npc.she] desperately [npc.verb(lick)] up every last drop of cum; only discarding the condom once [npc.sheIs] sure that's it's completely empty."
-				+ "</p>")
-				+ target.ingestFluid(SexAreaOrifice.MOUTH, storedFluids)
-				+ target.addItem(Main.game.getItemGen().generateItem(ItemType.MOO_MILKER_EMPTY), false);
+				target.ingestFluid(SexAreaOrifice.MOUTH, storedFluids)
+				+ target.addItem(Main.game.getItemGen().generateItem(ItemType.MOO_MILKER_EMPTY), false));
 	}
 
 	public List<FluidStored> getStoredFluids() {

@@ -5,14 +5,9 @@ import org.w3c.dom.Element;
 
 import com.lilithsthrone.controller.xmlParsing.XMLUtil;
 import com.lilithsthrone.game.character.attributes.Attribute;
-import com.lilithsthrone.game.character.body.FluidCum;
-import com.lilithsthrone.game.character.body.FluidGirlCum;
-import com.lilithsthrone.game.character.body.FluidInterface;
-import com.lilithsthrone.game.character.body.FluidMilk;
-import com.lilithsthrone.game.character.body.valueEnums.FluidModifier;
+import com.lilithsthrone.game.character.body.AbstractFluid;
 import com.lilithsthrone.game.character.race.AbstractSubspecies;
 import com.lilithsthrone.game.character.race.Subspecies;
-import com.lilithsthrone.game.inventory.enchanting.ItemEffect;
 import com.lilithsthrone.main.Main;
 import com.lilithsthrone.utils.XMLSaving;
 
@@ -21,273 +16,144 @@ import com.lilithsthrone.utils.XMLSaving;
  * @version 0.3.1
  * @author Innoxia
  */
-public class FluidStored implements XMLSaving {
+public class FluidStored extends AbstractFluid implements XMLSaving {
 
-	private String charactersFluidID;
-	private AbstractSubspecies cumSubspecies; // used for calculating pregnancy.
-	private AbstractSubspecies cumHalfDemonSubspecies; // used for calculating pregnancy.
-	private float virility;
-	private boolean feral;
-	private FluidCum cum;
-	private FluidMilk milk;
-	private FluidGirlCum girlCum;
+	private class GeneData {
+		private AbstractSubspecies Subspecies; // used for calculating pregnancy.
+		private AbstractSubspecies HalfDemonSubspecies; // used for calculating pregnancy.
+		private float virility;
+		private boolean feral;
+		public GeneData(AbstractSubspecies Subspecies, AbstractSubspecies HalfDemonSubspecies, float virility, boolean feral){
+			this.Subspecies = Subspecies;
+			this.HalfDemonSubspecies = HalfDemonSubspecies;
+			this.virility = virility;
+			this.feral = feral;
+		}
+	}
+	//GENERAL EXPLANATION:
+	//FluidStored is extended from AbstractFluid. In many ways, FluidStored is extruded from it, from a customized production
+	//template to a finalized liquid that can be interacted with, having a quantity and geneData which is detached from
+	//the person itself to correctly reflect the npc's state then compared to now which may have gone through significant changes.
+
 	private float millilitres;
-	//changing all FluidMilk, FluidCum, FluidGirlcum to FluidInterface
-	//MARKER BASICALLY A FUCKIN OVERHAUL
+	private GeneData geneData;
+	private String charactersFluidID;
 
 	public FluidStored(FluidStored fluid){
-		this.charactersFluidID = fluid.charactersFluidID;
-		this.cumSubspecies = fluid.cumSubspecies;
-		this.cumHalfDemonSubspecies = fluid.cumHalfDemonSubspecies;
-		this.virility = fluid.virility;
-		this.feral = fluid.feral;
-		this.cum = fluid.cum;
-		this.milk = fluid.milk;
-		this.girlCum = fluid.girlCum;
+		super(fluid);
 		this.millilitres = fluid.millilitres;
+		this.charactersFluidID = fluid.charactersFluidID;
+		this.geneData = fluid.geneData;
 	}
 
-	public FluidStored(GameCharacter character, FluidInterface fluid, float millilitres) {
-		if(character!=null) {
-			this.charactersFluidID = character.getId();
-			this.cumSubspecies = character.getSubspecies();
-			this.cumHalfDemonSubspecies = character.getHalfDemonSubspecies();
-			this.virility = character.getAttributeValue(Attribute.VIRILITY);
-			this.feral = fluid.isFeral(character);
+	public FluidStored(GameCharacter character, AbstractFluid fluid, float millilitres) {
+		super(fluid);
 
+		if(character!=null) {
+			geneData = new GeneData(character.getSubspecies(),
+					character.getHalfDemonSubspecies(),
+					character.getAttributeValue(Attribute.VIRILITY),
+					character.isFeral());
+		} else {
+			geneData = new GeneData(null,
+					null,
+					25,
+					false);
+		}
+
+		if(character!=null){
+			charactersFluidID = character.getId();
+		} else {
+			charactersFluidID = "";
+		}
+
+		this.millilitres = millilitres;
+	}
+
+	public FluidStored(String charactersFluidID, AbstractFluid fluid, float millilitres) {
+		super(fluid);
+
+		GameCharacter owner = null;
+		try{
+			owner = Main.game.getNPCById(charactersFluidID);
+		} catch (Exception ex){};
+
+		if(owner!=null) {
+			geneData = new GeneData(owner.getSubspecies(),
+					owner.getHalfDemonSubspecies(),
+					owner.getAttributeValue(Attribute.VIRILITY),
+					owner.isFeral());
+		} else {
+			geneData = new GeneData(null,
+					null,
+					25,
+					false);
+		}
+
+		if(owner!=null){
+			this.charactersFluidID = charactersFluidID;
 		} else {
 			this.charactersFluidID = "";
-			this.cumSubspecies = null;
-			this.cumHalfDemonSubspecies = null;
-			this.virility = 25;
-			this.feral = false;
 		}
-
-		switch (fluid.getType().getBaseType()){
-			case CUM:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-					this.virility = owner==null?25:owner.getAttributeValue(Attribute.VIRILITY);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.cum = new FluidCum(fluid.getType());
-				this.cum.clearFluidModifiers();
-
-				this.cum.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.cum.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.cum.addTransformativeEffect(ie);
-				}
-				break;
-
-			case MILK:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.milk = new FluidMilk(fluid.getType(), fluid.isCrotchMilk());
-				this.milk.clearFluidModifiers();
-
-				this.milk.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.milk.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.milk.addTransformativeEffect(ie);
-				}
-				break;
-
-			case GIRLCUM:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.girlCum = new FluidGirlCum(fluid.getType());
-				this.girlCum.clearFluidModifiers();
-
-				this.girlCum.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.girlCum.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.girlCum.addTransformativeEffect(ie);
-				}
-				break;
-		}
-
-
 
 		this.millilitres = millilitres;
 	}
 
-	public FluidStored(String charactersFluidID, AbstractSubspecies cumSubspecies, AbstractSubspecies cumHalfDemonSubspecies, FluidInterface fluid, float millilitres) {
-		this.charactersFluidID = charactersFluidID;
+	public FluidStored(String charactersFluidID, AbstractSubspecies cumSubspecies, AbstractSubspecies cumHalfDemonSubspecies, AbstractFluid fluid, float millilitres) {
+		super(fluid);
 
-		this.cumSubspecies = cumSubspecies;
-		this.cumHalfDemonSubspecies = cumHalfDemonSubspecies;
-		this.virility = 0;
+		GameCharacter owner = null;
+		try{
+			owner = Main.game.getNPCById(charactersFluidID);
+		} catch (Exception ex){};
 
-		switch (fluid.getType().getBaseType()){
-			case CUM:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-					this.virility = owner==null?25:owner.getAttributeValue(Attribute.VIRILITY);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.cum = new FluidCum(fluid.getType());
-				this.cum.clearFluidModifiers();
-
-				this.cum.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.cum.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.cum.addTransformativeEffect(ie);
-				}
-				break;
-
-			case MILK:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.milk = new FluidMilk(fluid.getType(), fluid.isCrotchMilk());
-				this.milk.clearFluidModifiers();
-
-				this.milk.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.milk.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.milk.addTransformativeEffect(ie);
-				}
-				break;
-
-			case GIRLCUM:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.girlCum = new FluidGirlCum(fluid.getType());
-				this.girlCum.clearFluidModifiers();
-
-				this.girlCum.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.girlCum.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.girlCum.addTransformativeEffect(ie);
-				}
-				break;
+		if(owner!=null) {
+			geneData = new GeneData(owner.getSubspecies(),
+					owner.getHalfDemonSubspecies(),
+					owner.getAttributeValue(Attribute.VIRILITY),
+					owner.isFeral());
+		} else {
+			geneData = new GeneData(null,
+					null,
+					25,
+					false);
 		}
 
+		if(owner!=null){
+			this.charactersFluidID = charactersFluidID;
+		} else {
+			this.charactersFluidID = "";
+		}
 
 		this.millilitres = millilitres;
 	}
 
-	public FluidStored(String charactersFluidID, FluidInterface fluid, float millilitres) {
-		this.charactersFluidID = charactersFluidID;
+	public FluidStored(String charactersFluidID,
+					   AbstractFluid fluid,
+					   AbstractSubspecies Subspecies,
+					   AbstractSubspecies HalfDemonSubspecies,
+					   boolean feral,
+					   float virility,
+					   float millilitres) {
 
-		this.cumSubspecies = null;
-		this.cumHalfDemonSubspecies = null;
-		this.virility = 0;
-
-		switch (fluid.getType().getBaseType()){
-			case CUM:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-					this.virility = owner==null?25:owner.getAttributeValue(Attribute.VIRILITY);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.cum = new FluidCum(fluid.getType());
-				this.cum.clearFluidModifiers();
-
-				this.cum.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.cum.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.cum.addTransformativeEffect(ie);
-				}
-				break;
-
-			case MILK:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.milk = new FluidMilk(fluid.getType(), fluid.isCrotchMilk());
-				this.milk.clearFluidModifiers();
-
-				this.milk.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.milk.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.milk.addTransformativeEffect(ie);
-				}
-				break;
-
-			case GIRLCUM:
-				try {
-					GameCharacter owner = charactersFluidID==null||charactersFluidID.isEmpty()?null:Main.game.getNPCById(charactersFluidID);
-					this.feral = fluid.isFeral(owner);
-				} catch (Exception e) {
-					this.feral = false;
-				}
-
-				this.girlCum = new FluidGirlCum(fluid.getType());
-				this.girlCum.clearFluidModifiers();
-
-				this.girlCum.setFlavour(null, fluid.getFlavour());
-				for(FluidModifier fm : fluid.getFluidModifiers()) {
-					this.girlCum.addFluidModifier(null, fm);
-				}
-				for(ItemEffect ie : fluid.getTransformativeEffects()) {
-					this.girlCum.addTransformativeEffect(ie);
-				}
-				break;
-		}
-
+		super(fluid);
+		this.geneData = new GeneData(Subspecies,
+				HalfDemonSubspecies,
+				virility,
+				feral);
 		this.millilitres = millilitres;
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		// Does not take into account quantity on purpose.
 		if(o instanceof FluidStored){
-			if(((FluidStored)o).getFluid().equals(this.getFluid())
+			if(super.equals(o)
 					&& ((FluidStored)o).getCharactersFluidID().equals(this.getCharactersFluidID())
 					&& ((FluidStored)o).isFeral() == this.isFeral()
-					&& ((FluidStored)o).getCumSubspecies()==this.getCumSubspecies()
-					&& ((FluidStored)o).getCumHalfDemonSubspecies()==this.getCumHalfDemonSubspecies()
-					&& ((FluidStored)o).getVirility() == this.getVirility()) {
+					&& ((FluidStored)o).getSubspecies()==this.getSubspecies()
+					&& ((FluidStored)o).getHalfDemonSubspecies()==this.getHalfDemonSubspecies()
+					&& ((FluidStored)o).getVirility() == this.getVirility()
+					&& ((FluidStored)o).getMillilitres() == this.getMillilitres()) {
 				return true;
 			}
 		}
@@ -298,14 +164,14 @@ public class FluidStored implements XMLSaving {
 	public int hashCode() {
 		// Does not take into account quantity on purpose.
 		int result = 17;
-		result = 31 * result + this.getFluid().hashCode();
+		result = 31 * result + super.hashCode();
 		result = 31 * result + this.getCharactersFluidID().hashCode();
 		result = 31 * result + (this.isFeral() ? 1 : 0);
-		if(this.getCumSubspecies()!=null) {
-			result = 31 * result + this.getCumSubspecies().hashCode();
+		if(this.getSubspecies()!=null) {
+			result = 31 * result + this.getSubspecies().hashCode();
 		}
-		if(this.getCumHalfDemonSubspecies()!=null) {
-			result = 31 * result + this.getCumHalfDemonSubspecies().hashCode();
+		if(this.getHalfDemonSubspecies()!=null) {
+			result = 31 * result + this.getHalfDemonSubspecies().hashCode();
 		}
 		result = 31 * result + Float.floatToIntBits(this.getVirility());
 		return result;
@@ -316,24 +182,16 @@ public class FluidStored implements XMLSaving {
 		// Core:
 		Element fluidStoredElement = doc.createElement("fluidStored");
 		parentElement.appendChild(fluidStoredElement);
+
 		XMLUtil.addAttribute(doc, fluidStoredElement, "charactersFluidID", charactersFluidID);
-		XMLUtil.addAttribute(doc, fluidStoredElement, "bestial", String.valueOf(feral));
-		XMLUtil.addAttribute(doc, fluidStoredElement, "virility", String.valueOf(virility));
+		XMLUtil.addAttribute(doc, fluidStoredElement, "feral", String.valueOf(geneData.feral));
+		XMLUtil.addAttribute(doc, fluidStoredElement, "virility", String.valueOf(geneData.virility));
+		XMLUtil.addAttribute(doc, fluidStoredElement, "Subspecies", String.valueOf(geneData.Subspecies));
+		XMLUtil.addAttribute(doc, fluidStoredElement, "HalfDemonSubspecies", String.valueOf(geneData.HalfDemonSubspecies));
 		XMLUtil.addAttribute(doc, fluidStoredElement, "millilitres", String.valueOf(millilitres));
 
-		if(isCum()) {
-			XMLUtil.addAttribute(doc, fluidStoredElement, "cumSubspecies", Subspecies.getIdFromSubspecies(cumSubspecies));
-			if(cumHalfDemonSubspecies!=null) {
-				XMLUtil.addAttribute(doc, fluidStoredElement, "cumHalfDemonSubspecies", Subspecies.getIdFromSubspecies(cumHalfDemonSubspecies));
-			}
-			cum.saveAsXML(fluidStoredElement, doc);
-		}
-		if(isMilk()) {
-			milk.saveAsXML("milk", fluidStoredElement, doc);
-		}
-		if(isGirlCum()) {
-			girlCum.saveAsXML(fluidStoredElement, doc);
-		}
+
+		super.saveAsXML(fluidStoredElement, doc);
 
 		return fluidStoredElement;
 	}
@@ -341,41 +199,35 @@ public class FluidStored implements XMLSaving {
 	public static FluidStored loadFromXML(StringBuilder log, Element parentElement, Document doc) {
 		String ID = parentElement.getAttribute("charactersFluidID");
 
-		float millimetres = Float.parseFloat(parentElement.getAttribute("millilitres"));
+		float millilitres = Float.parseFloat(parentElement.getAttribute("millilitres"));
 
 		boolean feral = false;
 		float virility = 25;
-		try {
-			feral = Boolean.parseBoolean(parentElement.getAttribute("bestial"));
-			virility = Float.parseFloat(parentElement.getAttribute("virility"));
-		} catch(Exception ex) {
+		virility = Float.parseFloat(parentElement.getAttribute("virility"));
+
+		if(parentElement.hasAttribute("bestial")){ //legacy code
+			String typeName = parentElement.getChildNodes().item(0).getNodeName();
+
+			return new FluidStored(ID,
+					AbstractFluid.loadFromXML(parentElement, doc, null, typeName),
+					Subspecies.getSubspeciesFromId(parentElement.getAttribute("cumSubspecies")),
+					Subspecies.getSubspeciesFromId(parentElement.getAttribute("cumHalfDemonSubspecies")),
+					Boolean.parseBoolean(parentElement.getAttribute("bestial")),
+					virility,
+					millilitres);
 		}
 
-		if(parentElement.getElementsByTagName("milk").item(0)!=null) {
-			FluidStored fluid = new FluidStored(ID, FluidMilk.loadFromXML("milk", parentElement, doc), millimetres);
-			fluid.feral=feral;
-			fluid.virility=0;
-			return fluid;
-		}
-
-		if(parentElement.getElementsByTagName("cum").item(0)!=null) {
-			AbstractSubspecies subspecies = Subspecies.HUMAN;
-			AbstractSubspecies halfDemonSubspecies = Subspecies.HUMAN;
-			try {
-				subspecies = Subspecies.getSubspeciesFromId(parentElement.getAttribute("cumSubspecies"));
-				halfDemonSubspecies = Subspecies.getSubspeciesFromId(parentElement.getAttribute("cumHalfDemonSubspecies"));
-			} catch(Exception ex) {
-			}
-			FluidStored fluid = new FluidStored(ID, subspecies, halfDemonSubspecies, FluidCum.loadFromXML(parentElement, doc), millimetres);
-			fluid.feral=feral;
-			fluid.virility=virility;
-			return fluid;
-		}
-
-		FluidStored fluid = new FluidStored(ID, FluidGirlCum.loadFromXML(parentElement, doc), millimetres);
-		fluid.feral=feral;
-		fluid.virility=0;
-		return fluid;
+		//new code:
+		//-bestial hammered off
+		//-removed cum from saving structure, since it doesn't have to be unique to it anymore
+		//+loads the fluidTemplate it's based on instead of whatever the old thing was
+		return new FluidStored(ID,
+				AbstractFluid.loadFromXML(parentElement, doc, null, ""),
+				Subspecies.getSubspeciesFromId(parentElement.getAttribute("Subspecies")),
+				Subspecies.getSubspeciesFromId(parentElement.getAttribute("HalfDemonSubspecies")),
+				Boolean.parseBoolean(parentElement.getAttribute("feral")),
+				virility,
+				millilitres);
 	}
 
 
@@ -394,46 +246,24 @@ public class FluidStored implements XMLSaving {
 		return Main.game.getNPCById(charactersFluidID);
 	}
 
-	public boolean isCum() {
-		return cum!=null;
+	public AbstractSubspecies getSubspecies() {
+		return geneData.Subspecies;
 	}
 
-	public boolean isMilk() {
-		return milk!=null;
-	}
-
-	public boolean isGirlCum() {
-		return girlCum!=null;
-	}
-
-	public FluidInterface getFluid() {
-		if(isCum()) {
-			return cum;
-		}
-		if(isMilk()) {
-			return milk;
-		}
-		return girlCum;
-	}
-
-	public AbstractSubspecies getCumSubspecies() {
-		return cumSubspecies;
-	}
-
-	public AbstractSubspecies getCumHalfDemonSubspecies() {
-		return cumHalfDemonSubspecies;
+	public AbstractSubspecies getHalfDemonSubspecies() {
+		return geneData.HalfDemonSubspecies;
 	}
 
 	public boolean isFeral() {
-		return feral;
+		return geneData.feral;
 	}
 
 	public float getVirility() {
-		return virility;
+		return geneData.virility;
 	}
 
 	public void setVirility(float virility) {
-		this.virility = virility;
+		this.geneData.virility = virility;
 	}
 
 	public float getMillilitres() {
