@@ -1,8 +1,17 @@
 package com.lilithsthrone.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lilithsthrone.game.character.FluidStored;
+import com.lilithsthrone.game.inventory.AbstractCoreItem;
+import com.lilithsthrone.game.inventory.AbstractFluidStorage;
+import com.lilithsthrone.game.inventory.item.AbstractFilledBreastPump;
+import com.lilithsthrone.game.inventory.item.AbstractFilledCondom;
+import com.lilithsthrone.game.inventory.item.FluidContainerInterface;
+import com.lilithsthrone.utils.Util;
 import org.w3c.dom.events.EventTarget;
 
 import com.lilithsthrone.controller.eventListeners.InventorySelectedItemEventListener;
@@ -402,7 +411,197 @@ public class InventoryController {
 			}
 		}
 	}
-	
+
+	public static void initFluidManagementListeners() {
+		for (AbstractCoreItem item : InventoryDialogue.usableItems.keySet()) {
+			String id = "CHOOSE_"+item.hashCode();
+			if (MainController.document.getElementById(id) != null) {
+
+				((EventTarget) MainController.document.getElementById(id)).addEventListener("click", e->{
+					if(InventoryDialogue.selectedItem == null && InventoryDialogue.chosenItem == item){
+						//nothing
+					} else if(InventoryDialogue.chosenItem == item
+						|| InventoryDialogue.selectedItem == item){ //if already in the selected/chosen, swap the two around
+						AbstractCoreItem it = InventoryDialogue.chosenItem;
+						InventoryDialogue.chosenItem = InventoryDialogue.selectedItem;
+						InventoryDialogue.selectedItem = it;
+					} else {
+						InventoryDialogue.chosenItem = InventoryDialogue.selectedItem;
+						InventoryDialogue.selectedItem = item;
+					}
+					InventoryDialogue.selectedFluid.clear();
+					InventoryDialogue.selectedItemPreview = InventoryDialogue.usableItems.get(InventoryDialogue.selectedItem);
+					InventoryDialogue.chosenItemPreview = InventoryDialogue.usableItems.get(InventoryDialogue.chosenItem);
+					Main.game.setContent(new Response("", "", Main.game.getCurrentDialogueNode()));
+				}, false);
+
+				if(item instanceof FluidContainerInterface){
+					if(item instanceof AbstractFilledCondom){
+						MainController.addTooltipListeners(id, new TooltipInventoryEventListener().setItem((AbstractFilledCondom) item, Main.game.getPlayer(), null));
+					} else if(item instanceof AbstractFilledBreastPump){
+						MainController.addTooltipListeners(id, new TooltipInventoryEventListener().setItem((AbstractFilledBreastPump) item, Main.game.getPlayer(), null));
+					}
+				} else if(item instanceof AbstractItem){
+					MainController.addTooltipListeners(id, new TooltipInventoryEventListener().setItem((AbstractItem) item, Main.game.getPlayer(), null));
+				} else if(item instanceof AbstractWeapon){
+					MainController.addTooltipListeners(id, new TooltipInventoryEventListener().setWeapon((AbstractWeapon) item, Main.game.getPlayer(), false));
+				} else if(item instanceof AbstractClothing){
+					MainController.addTooltipListeners(id, new TooltipInventoryEventListener().setClothing((AbstractClothing) item, Main.game.getPlayer(), null));
+				}
+			}
+		}
+		Map<String, Integer> mappings = Util.newHashMapOfValues(
+				new Util.Value<>("MIN", -1000000000),
+				new Util.Value<>("DECREASE_GIANT", -1000),
+				new Util.Value<>("DECREASE_HUGE", -100),
+				new Util.Value<>("DECREASE_LARGE", -10),
+				new Util.Value<>("DECREASE", -1),
+				new Util.Value<>("INCREASE", 1),
+				new Util.Value<>("INCREASE_LARGE", 10),
+				new Util.Value<>("INCREASE_HUGE", 100),
+				new Util.Value<>("INCREASE_GIANT", 1000),
+				new Util.Value<>("MAX", 1000000000));
+		if(!InventoryDialogue.preciseTransfer){
+			mappings = Util.newHashMapOfValues(
+					new Util.Value<>("MIN", -1000000000),
+					new Util.Value<>("DECREASE_LARGE", -(int)InventoryDialogue.selectedMillilitres/2),
+					new Util.Value<>("DECREASE", -(int)InventoryDialogue.selectedMillilitres/8),
+					new Util.Value<>("INCREASE", (int)InventoryDialogue.selectedMillilitres/8),
+					new Util.Value<>("INCREASE_LARGE", (int)InventoryDialogue.selectedMillilitres/2),
+					new Util.Value<>("MAX", 1000000000));
+		}
+		for (Map.Entry<String, Integer> entry : mappings.entrySet()) {
+			String i = entry.getKey();
+			int j = entry.getValue();
+			String id = "FLUID_TRANSFER_" + i;
+
+			if (MainController.document.getElementById(id) != null) {
+				((EventTarget) MainController.document.getElementById(id)).addEventListener("click", e->{
+					InventoryDialogue.fluidAmount = Math.max(0,Math.min(InventoryDialogue.selectedMillilitres, InventoryDialogue.fluidAmount+j));
+					Main.game.setContent(new Response("", "", Main.game.getCurrentDialogueNode()));
+				}, false);
+			}
+		}
+
+		String id = "FLUID_TRANSFER";
+
+		if (MainController.document.getElementById(id) != null) {
+			((EventTarget) MainController.document.getElementById(id)).addEventListener("click", e->{
+				float total = (float) InventoryDialogue.selectedFluid.stream().mapToDouble(FluidStored::getMillilitres).sum();
+				Float quantity = Math.min(total, InventoryDialogue.fluidAmount);
+				FluidContainerInterface realGiver = (FluidContainerInterface)InventoryDialogue.chosenItem;
+				FluidContainerInterface realReceiver = (FluidContainerInterface)InventoryDialogue.selectedItem;
+
+				FluidContainerInterface giver = (FluidContainerInterface) InventoryDialogue.usableItems.get(realGiver);
+				FluidContainerInterface receiver = (FluidContainerInterface) InventoryDialogue.usableItems.get(realReceiver);
+
+				//System.out.println("uhh?" + (giver == realGiver) + " equals?: " + giver.equals(realGiver));
+				System.out.println("preview is orig?: " + (giver == realGiver) + " equals?: " + giver.equals(realGiver) + ". " + giver + ", " + realGiver);
+				if(!InventoryDialogue.preciseTransfer || InventoryDialogue.selectedFluid.isEmpty()){
+					List<FluidStored> fluids = new ArrayList<>(giver.getStoredFluids());
+					float totalVolume = giver.getMillilitresStored();
+					for(FluidStored fluid : fluids){
+						float drained = quantity*fluid.getMillilitres()/totalVolume;
+						receiver.addFluid(fluid, drained);
+						giver.removeFluid(fluid, drained);
+
+						FluidStored infoFluid = new FluidStored(fluid);
+						infoFluid.setMillilitres(drained);
+						Object[] log = {realGiver, infoFluid, realReceiver};
+						InventoryDialogue.transferLog.add(log);
+
+					}
+				} else {
+					List<FluidStored> newFluids = new ArrayList<>();
+
+//					System.out.println("giver liquids: qt Tr =" + quantity);
+//					for(FluidStored fluid : ((FluidContainerInterface) InventoryDialogue.chosenItemPreview).getStoredFluids()){
+//
+//						System.out.println("{" + fluid.hashCode() + ", q=" + fluid.getMillilitres() + "}");
+//					}
+					for(FluidStored fluid : InventoryDialogue.selectedFluid) {
+						float amount = quantity*fluid.getMillilitres()/total;
+						receiver.addFluid(fluid, amount);
+						giver.removeFluid(fluid, amount);
+						FluidStored updatedFluid = giver.getFluid(fluid);
+						if(updatedFluid!= null){
+							newFluids.add(updatedFluid);
+//							System.out.println("is not null");
+						}
+//						System.out.println("is null");
+
+						FluidStored infoFluid = new FluidStored(fluid);
+						infoFluid.setMillilitres(amount);
+						Object[] log = {realGiver, infoFluid, realReceiver};
+						Object[] prevlog = {null,null,null};
+						if(InventoryDialogue.transferLog.size()>0){
+							prevlog = InventoryDialogue.transferLog.get(InventoryDialogue.transferLog.size()-1);
+						}
+
+//						System.out.println("LOG giver: " + log[0] + " fluid: " + log[1] + " reciever: " + log[2]);
+//						System.out.println("PREVLOG giver: " + prevlog[0] + " fluid: " + prevlog[1] + " reciever: " + prevlog[2]);
+//						System.out.println("isfluid same? " + log[1].equals(log[1]));
+						//some simple logcrushing
+						if(log[0] == prevlog[0]
+							&& log[2] == prevlog[2]
+							&& ((FluidStored)log[1]).equals(prevlog[1], false)){
+							FluidStored prevFLuid = ((FluidStored)prevlog[1]);
+							prevFLuid.setMillilitres(prevFLuid.getMillilitres() + ((FluidStored)log[1]).getMillilitres());
+//							System.out.println("crushSame");
+						} else if(log[0] == prevlog[2]
+							&& log[2] == prevlog[0]
+							&& ((FluidStored)log[1]).equals(prevlog[1], false)){
+							FluidStored prevFLuid = ((FluidStored)prevlog[1]);
+							if(prevFLuid.getMillilitres()>((FluidStored)log[1]).getMillilitres()){
+//								System.out.println("crushOtherSub");
+								prevFLuid.setMillilitres(prevFLuid.getMillilitres() - ((FluidStored)log[1]).getMillilitres());
+							} else {
+								//swapping logs around ex:
+								// log1 = B1 -> F1 (46ml) -> B3
+								// then log2 = B3 -> F1(48ml) -> B1
+								// crush is log2 deleted, log1 = B3 -> F1(2ml) -> B1
+								prevFLuid.setMillilitres(((FluidStored)log[1]).getMillilitres() - prevFLuid.getMillilitres());
+								prevlog[0] = log[2];
+								prevlog[2] = log[0];
+//								System.out.println("crushOtherSwap");
+							}
+						} else {
+							InventoryDialogue.transferLog.add(log);
+//							System.out.println("addLog");
+						}
+					}
+//					System.out.println("uh");
+					InventoryDialogue.selectedFluid.clear();
+					InventoryDialogue.selectedFluid.addAll(newFluids);
+//					System.out.println("new giver liquids: qt Tr =" + quantity);
+//					for(FluidStored fluid : ((FluidContainerInterface) InventoryDialogue.chosenItemPreview).getStoredFluids()){
+//
+//						System.out.println("{" + fluid.hashCode() + ", q=" + fluid.getMillilitres() + "}");
+//					}
+				}
+
+				Main.game.setContent(new Response("", "", Main.game.getCurrentDialogueNode()));
+			}, false);
+		}
+
+		if(InventoryDialogue.chosenItemPreview instanceof FluidContainerInterface){
+			for(FluidStored fluid : ((FluidContainerInterface)InventoryDialogue.chosenItemPreview).getStoredFluids()){
+				id = "CHOOSE_FLUID_" + fluid.hashCode() + "_" + InventoryDialogue.chosenItemPreview.hashCode();
+				if (MainController.document.getElementById(id) != null) {
+					((EventTarget) MainController.document.getElementById(id)).addEventListener("click", e->{
+						if(InventoryDialogue.selectedFluid.contains(fluid)){
+							InventoryDialogue.selectedFluid.remove(fluid);
+						} else {
+							InventoryDialogue.selectedFluid.add(fluid);
+						}
+						Main.game.setContent(new Response("", "", Main.game.getCurrentDialogueNode()));
+					}, false);
+				}
+			}
+		}
+
+	}
+
 	public static void initDamageTypeListeners() {
 		AbstractWeaponType weapon = InventoryDialogue.getWeapon().getWeaponType();
 		for (DamageType dt : weapon.getAvailableDamageTypes()) {

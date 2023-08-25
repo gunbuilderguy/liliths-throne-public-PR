@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.lilithsthrone.game.character.body.*;
+import com.lilithsthrone.game.character.body.types.*;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,7 +51,7 @@ import com.lilithsthrone.game.character.attributes.IntelligenceLevel;
 import com.lilithsthrone.game.character.attributes.LustLevel;
 import com.lilithsthrone.game.character.attributes.ObedienceLevel;
 import com.lilithsthrone.game.character.attributes.ObedienceLevelBasic;
-import com.lilithsthrone.game.character.body.AbstractFluid;
+import com.lilithsthrone.game.character.body.Fluid;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractAntennaType;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractArmType;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractAssType;
@@ -76,24 +77,6 @@ import com.lilithsthrone.game.character.body.coverings.BodyCoveringCategory;
 import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
 import com.lilithsthrone.game.character.body.coverings.Covering;
 import com.lilithsthrone.game.character.body.tags.BodyPartTag;
-import com.lilithsthrone.game.character.body.types.AntennaType;
-import com.lilithsthrone.game.character.body.types.ArmType;
-import com.lilithsthrone.game.character.body.types.AssType;
-import com.lilithsthrone.game.character.body.types.BreastType;
-import com.lilithsthrone.game.character.body.types.EarType;
-import com.lilithsthrone.game.character.body.types.EyeType;
-import com.lilithsthrone.game.character.body.types.FaceType;
-import com.lilithsthrone.game.character.body.types.FluidType;
-import com.lilithsthrone.game.character.body.types.FootType;
-import com.lilithsthrone.game.character.body.types.HairType;
-import com.lilithsthrone.game.character.body.types.HornType;
-import com.lilithsthrone.game.character.body.types.LegType;
-import com.lilithsthrone.game.character.body.types.PenisType;
-import com.lilithsthrone.game.character.body.types.TailType;
-import com.lilithsthrone.game.character.body.types.TentacleType;
-import com.lilithsthrone.game.character.body.types.TorsoType;
-import com.lilithsthrone.game.character.body.types.VaginaType;
-import com.lilithsthrone.game.character.body.types.WingType;
 import com.lilithsthrone.game.character.body.valueEnums.AgeCategory;
 import com.lilithsthrone.game.character.body.valueEnums.AreolaeShape;
 import com.lilithsthrone.game.character.body.valueEnums.AreolaeSize;
@@ -3253,7 +3236,7 @@ public abstract class GameCharacter implements XMLSaving {
 //		
 //		Element psychoactives = doc.createElement("psychoactiveFluids");
 //		properties.appendChild(psychoactives);
-//		for(FluidType ft : this.getPsychoactiveFluidsIngested()) {
+//		for(AbstractFluidType ft : this.getPsychoactiveFluidsIngested()) {
 //			Element element = doc.createElement("fluid");
 //			psychoactives.appendChild(element);
 //			XMLUtil.addAttribute(doc, element, "value", ft.toString());
@@ -8422,12 +8405,12 @@ public abstract class GameCharacter implements XMLSaving {
 							if(includesOrgasm) {
 								AbstractRacialBody body = RacialBody.valueOfRace(subspeciesBackup.getRace());
 								getStretchDescription(null, Penis.getGenericDiameter(body.getPenisSize(), PenetrationGirth.getGirthFromInt(body.getPenisGirth())), this, (SexAreaOrifice)performingArea);
-								if(partnerCummedInside) {
+                                if(partnerCummedInside) {
 									this.incrementCumCount(null, new SexType(SexParticipantType.NORMAL, performingArea, SexAreaPenetration.PENIS));
 									ingestFluidSB.append(this.ingestFluid(null,
 											subspeciesBackup,
 											halfDemonSubspeciesBackup,
-											new AbstractFluid(body.getPenisType().getTesticleType().getFluidType()),
+											new Fluid(body.getPenisType().getTesticleType().getFluidType()),
 											(SexAreaOrifice)performingArea,
 											(float) (body.getCumProduction()*(0.5+Math.random()))));
 								}
@@ -8963,7 +8946,7 @@ public abstract class GameCharacter implements XMLSaving {
 								this.ingestFluid(null,
 										subspeciesBackup,
 										halfDemonSubspeciesBackup,
-										new AbstractFluid(body.getVaginaType().getFluidType()),
+										new Fluid(body.getVaginaType().getFluidType()),
 										(SexAreaOrifice)performingArea,
 										(float) Math.max(5, Math.min(25, body.getVaginaWetness()*5)));
 							}
@@ -9000,7 +8983,7 @@ public abstract class GameCharacter implements XMLSaving {
 								this.ingestFluid(null,
 										subspeciesBackup,
 										halfDemonSubspeciesBackup,
-										new AbstractFluid(body.getBreastType().getFluidType()),
+										new Fluid(body.getBreastType().getFluidType()),
 										(SexAreaOrifice)performingArea,
 										(float) Math.min(500, (body.getFemaleLactationRate()*(0.5+Math.random()))));
 							}
@@ -9037,7 +9020,7 @@ public abstract class GameCharacter implements XMLSaving {
 								this.ingestFluid(null,
 										subspeciesBackup,
 										halfDemonSubspeciesBackup,
-										new AbstractFluid(body.getBreastType().getFluidType()),
+										new Fluid(body.getBreastType().getFluidType()),
 										(SexAreaOrifice)performingArea,
 										(float) Math.min(500, (body.getFemaleLactationRate()*(0.5+Math.random()))));
 							}
@@ -18316,40 +18299,31 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	public String ingestFluid(FluidStored fluid, SexAreaOrifice orificeIngestedThrough) {
-		GameCharacter fluidOwner;
-		try {
-			fluidOwner = fluid.getFluidCharacter();
-		} catch (Exception e) {
-			fluidOwner = null;
-		}
+		GameCharacter fluidOwner = fluid.getFluidCharacter();
 		return ingestFluid(fluidOwner, fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, orificeIngestedThrough, fluid.getMillilitres());
 	}
 
 	public String ingestFluid(FluidStored fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
-		GameCharacter fluidOwner;
-		try {
-			fluidOwner = fluid.getFluidCharacter();
-		} catch (Exception e) {
-			fluidOwner = null;
-		}
+		GameCharacter fluidOwner = fluid.getFluidCharacter();
+
 		return ingestFluid(fluidOwner, fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, orificeIngestedThrough, millilitres);
 	}
 	
-	public String ingestFluid(GameCharacter charactersFluid, AbstractFluid fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
+	public String ingestFluid(GameCharacter charactersFluid, Fluid fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
 		return ingestFluid(charactersFluid, charactersFluid.getSubspecies(), charactersFluid.getHalfDemonSubspecies(), fluid, orificeIngestedThrough, millilitres);
 	}
 
 	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, AbstractFluidType fluidType, SexAreaOrifice orificeIngestedThrough, float millilitres) {
-		return ingestFluid(charactersFluid, subspecies, halfDemonSubspecies, new AbstractFluid(fluidType), orificeIngestedThrough, millilitres);
+		return ingestFluid(charactersFluid, subspecies, halfDemonSubspecies, new Fluid(fluidType), orificeIngestedThrough, millilitres);
 	}
 	
 	/**
-	 * @param fluid The FluidType to be ingested.
+	 * @param fluid The AbstractFluidType to be ingested.
 	 * @param orificeIngestedThrough Orifice through which the fluid is being ingested.
 	 * @param addictive Is this fluid addictive or not.
 	 * @return A <b>formatted paragraph</b> description of addiction increasing/satisfied, or an empty String if no addictive effects occur.
 	 */
-	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, AbstractFluid fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
+	public String ingestFluid(GameCharacter charactersFluid, AbstractSubspecies subspecies, AbstractSubspecies halfDemonSubspecies, Fluid fluid, SexAreaOrifice orificeIngestedThrough, float millilitres) {
         FluidStored storedFluid = new FluidStored("", subspecies, halfDemonSubspecies, fluid, millilitres);
         if(charactersFluid != null){
             storedFluid = new FluidStored(charactersFluid.getId(), fluid, millilitres);
@@ -18367,7 +18341,7 @@ public abstract class GameCharacter implements XMLSaving {
 
         StringBuilder fluidIngestionSB = new StringBuilder();
         StringBuilder postSB = new StringBuilder();
-        Map<String, Float> fluidText = new HashMap<>();
+        Map<String, FluidStored> fluidText = new HashMap<>();
         Map<FluidStored, Float> weighedFluid = new HashMap<>();
         float totalVolume = (float) fluids.stream().mapToDouble(FluidStored::getMillilitres).sum();
         for(FluidStored fluid : fluids){
@@ -18379,124 +18353,184 @@ public abstract class GameCharacter implements XMLSaving {
             }
         }
 
-        for(FluidStored fluid : fluids){
-            List<FluidModifier> modifiers = fluid.getFluidModifiers();
+        //prettifying: by character then fluid type, if char is null then type
+        //maybe make it a standalone function
+        Map<String, List<FluidStored>> characterMap = new HashMap<>();
+        fluids.forEach(f -> characterMap.computeIfAbsent(f.getCharactersFluidID(), k -> new ArrayList<>()).add(f));
+        System.out.println("fluidmap: " + characterMap);
+        for(String id : characterMap.keySet()){
+
             GameCharacter charactersFluid = null;
-            float millilitres = fluid.getMillilitres();
             try {
-                charactersFluid = fluid.getFluidCharacter();
+                charactersFluid = Main.game.getNPCById(id);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            boolean found = false;
-            if(this.isVisiblyPregnant()) { // Limit intake based on 250ml max for pregnant characters:
-                millilitres = Math.min(millilitres, 250-this.getTotalFluidInArea(orificeIngestedThrough)) * weighedFluid.get(fluid);
-            }
+            boolean compact = characterMap.get(id).size()>1;
 
-            FluidStored newFluid = null;
-            switch(fluid.getBaseType()){
-                case CUM:
-                    if(charactersFluid == null){
-                        newFluid = new FluidStored("", fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, millilitres);
-                        break;
-                    }
-                case GIRLCUM:
-                case MILK:
-                    newFluid = new FluidStored(charactersFluid, fluid, millilitres);
-                    break;
-            }
+            List<String> subString = new ArrayList<>();
+            for(FluidStored fluid : characterMap.get(id)){
 
-            if(!this.getFluidsStoredInOrifice(orificeIngestedThrough).isEmpty() && charactersFluid!=null) {
-                for(FluidStored fluidStored : this.getFluidsStoredInOrifice(orificeIngestedThrough)) {
-                    if(((AbstractFluid)fluidStored).equals(newFluid)
-                            && fluidStored.getCharactersFluidID() == newFluid.getCharactersFluidID()
-                            && fluidStored.getVirility() == newFluid.getVirility()
-                            && fluidStored.isFeral() == newFluid.isFeral()
-                            && fluidStored.getHalfDemonSubspecies() == newFluid.getHalfDemonSubspecies()
-                            && fluidStored.getSubspecies() == newFluid.getSubspecies()) {
-                        fluidStored.incrementMillilitres(millilitres);
-                        found = true;
+                float millilitres = fluid.getMillilitres();
+                List<FluidModifier> modifiers = fluid.getFluidModifiers();
+                boolean found = false;
+                if(this.isVisiblyPregnant()) { // Limit intake based on 250ml max for pregnant characters:
+                    millilitres = Math.min(millilitres, 250-this.getTotalFluidInArea(orificeIngestedThrough)) * weighedFluid.get(fluid);
+                }
+
+                FluidStored newFluid = null;
+                switch(fluid.getBaseType()){
+                    case CUM:
+                        if(charactersFluid == null){
+                            newFluid = new FluidStored("", fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), fluid, millilitres);
+                            break;
+                        }
+                    case GIRLCUM:
+                    case MILK:
+                        newFluid = new FluidStored(fluid);
                         break;
+                }
+
+                if(!this.getFluidsStoredInOrifice(orificeIngestedThrough).isEmpty() && charactersFluid!=null) {
+                    for(FluidStored fluidStored : this.getFluidsStoredInOrifice(orificeIngestedThrough)) {
+                        if(((Fluid)fluidStored).equals(newFluid)
+                                && fluidStored.getCharactersFluidID() == newFluid.getCharactersFluidID()
+                                && fluidStored.getVirility() == newFluid.getVirility()
+                                && fluidStored.isFeral() == newFluid.isFeral()
+                                && fluidStored.getHalfDemonSubspecies() == newFluid.getHalfDemonSubspecies()
+                                && fluidStored.getSubspecies() == newFluid.getSubspecies()) {
+                            fluidStored.incrementMillilitres(millilitres);
+                            found = true;
+                            break;
+                        }
                     }
                 }
-            }
 
-            if(!found) {
-                this.addFluidStored(
-                        orificeIngestedThrough,
-                        new FluidStored(
-                                fluid.getCharactersFluidID(),
-                                fluid,
-                                millilitres));
-            }
-
-            switch(fluid.getBaseType()){
-                case CUM:
-                    if(Main.game.isInSex() && Main.sex.getAllParticipants().contains(this) && Main.sex.getAllParticipants().contains(charactersFluid)) {
-                        Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.CUM);
-                        break;
-                    }
-                case GIRLCUM:
-                    if(Main.game.isInSex()) {
-                        Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.GIRLCUM);
-                        break;
-                    }
-                case MILK:
-                    if(Main.game.isInSex()) {
-                        Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.MILK);
-                    }
-                    break;
-            }
-
-            if(charactersFluid == null){
-                Optional<String> find = fluidText.keySet().stream().filter(txt -> txt.contains(" of " + fluid.getName(null))).findFirst();
-                if(find.isPresent()){
-                    String newString = find.get();
-                    float oldQuantity = fluidText.get(newString);
-                    fluidText.remove(newString);
-                    fluidText.put("<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
-                            + Units.fluid(millilitres+oldQuantity)+ " of " + fluid.getName(null) + "</span>", millilitres+oldQuantity);
-                } else {
-                    fluidText.put("<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
-                            + Units.fluid(millilitres)+ " of " + fluid.getName(null) + "</span>", millilitres);
+                if(!found) {
+                    this.addFluidStored(
+                            orificeIngestedThrough,
+                            new FluidStored(
+                                    fluid.getCharactersFluidID(),
+                                    fluid,
+                                    millilitres));
                 }
-            } else {
-                fluidText.put(
+
+                switch(fluid.getBaseType()){
+                    case CUM:
+                        if(Main.game.isInSex() && Main.sex.getAllParticipants().contains(this) && Main.sex.getAllParticipants().contains(charactersFluid)) {
+                            Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.CUM);
+                            break;
+                        }
+                    case GIRLCUM:
+                        if(Main.game.isInSex()) {
+                            Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.GIRLCUM);
+                            break;
+                        }
+                    case MILK:
+                        if(Main.game.isInSex()) {
+                            Main.sex.addLubrication(this, orificeIngestedThrough, charactersFluid, LubricationType.MILK);
+                        }
+                        break;
+                }
+
+                String spanStart = (fluid.isGlowing()
+                        ?"[style.glow"
+                        :"[style.colour")
+                        + (fluid.getColour().getFormattingNames()==null
+                        ?fluid.getColour().getName().replaceAll("\\s", "")
+                        :fluid.getColour().getFormattingNames().get(0).replaceAll("\\s", "")) + "(";
+
+                if(id != "" && compact){
+                    subString.add(
                         "<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
-                                + Units.fluid(millilitres, Units.UnitType.SHORT) + " of "
-                                + "<span style ='color:"+charactersFluid.getFemininity().getColour().toWebHexString() + ";'>"
-                                + (charactersFluid == this?"[npc.HerHis]":charactersFluid.getName()) + " </span>"
-                                + fluid.getName(charactersFluid) + "</span>", millilitres);
-            }
+                            + spanStart + fluid.getName(charactersFluid) + ")]"
+                            + " (" + Units.fluid(millilitres, Units.UnitType.SHORT) + ")"
+                            + "</span>" );
 
+                } else if(id == ""){
+                    Optional<Entry<String, FluidStored>> find = fluidText.entrySet().stream().filter(ent -> ent.getValue() != null && ent.getValue().getType().equals(fluid.getType())).findFirst();
+                    String name = fluid.getType().getRace() == Race.HUMAN?"": fluid.getType().getRace().getDefaultTransformName()
+                            + " "
+                            + spanStart + Util.randomItemFrom(fluid.getBaseType().getNames()) + ")]";
 
-
-            for(FluidModifier mod : modifiers) {
-                String s = mod.applyEffects(this, charactersFluid, millilitres, fluid);
-                postSB.append(s);
-            }
-            //adding temporary transformations?
-            for(ItemEffect ie : fluid.getTransformativeEffects()){
-                //ideas on how to do that
-                //3 types: instant, over time and temporary
-                //store the current related bodypart(s) to be transformed, stored as an archive copy for when/if the transformation dissapears
-                //maybe for permanent transformations, keep it to null and delete the effect once applied
-                //for over time: same effects as clothing progressive TF
-                //for temporary: after some time transforms back to stored part, but reverse TF cannot revert non-temporary TFs applied
-            }
-
-            if((this.getBodyMaterial()==BodyMaterial.SLIME || orificeIngestedThrough == SexAreaOrifice.VAGINA)
-                    && fluid.getBaseType()==FluidTypeBase.CUM) {
-                if(charactersFluid!=null) {
-                    postSB.append(rollForPregnancy(charactersFluid, millilitres, Main.game.isInSex()));
-
-                } else if(fluid.getSubspecies()!=null) {
-                    postSB.append(rollForPregnancy(fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), millilitres, Main.game.isInSex()));
+                    if(find.isPresent() && find.get().getValue() != null){
+                        Entry<String, FluidStored> entry = find.get();
+                        float oldQuantity = fluidText.get(entry.getKey()).getMillilitres();
+                        FluidStored oldFluid = new FluidStored(fluidText.get(entry.getKey()));
+                        oldFluid.setMillilitres(millilitres+oldQuantity);
+                        fluidText.remove(entry.getKey());
+//                        fluid.isGlowing()
+//                                ?Covering.getFormattedColour(fluid.getColour(), fluid.getName(null), true, false)
+//                                :
+                        fluidText.put("<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
+                                + Units.fluid(millilitres+oldQuantity)+ " of "
+                                + name + "</span>", oldFluid);
+                    } else {
+                        fluidText.put("<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
+                                + Units.fluid(millilitres)+ " of "
+                                + name + "</span>", fluid);
+                    }
+                } else {
+                    fluidText.put(
+                            "<span style ='color:"+fluid.getBaseType().getColour().toWebHexString() + ";'>"
+                                    + Units.fluid(millilitres, Units.UnitType.SHORT) + " of "
+                                    + "<span style ='color:"+charactersFluid.getFemininity().getColour().toWebHexString() + ";'>"
+                                    + (charactersFluid == this
+                                    ?"[npc.HerHis] own"
+                                    :(charactersFluid.isPlayer()
+                                    ?"your"
+                                    :charactersFluid.getName() + "'s")) + " </span>"
+                                    + spanStart + fluid.getName(charactersFluid) + ")]"
+                                    + "</span>", fluid);
                 }
+
+                for(FluidModifier mod : modifiers) {
+                    String s = mod.applyEffects(this, charactersFluid, millilitres, fluid);
+                    postSB.append(s);
+                }
+                //adding temporary transformations?
+                for(ItemEffect ie : fluid.getTransformativeEffects()){
+                    //ideas on how to do that
+                    //3 types: instant, over time and temporary
+                    //store the current related bodypart(s) to be transformed, stored as an archive copy for when/if the transformation dissapears
+                    //maybe for permanent transformations, keep it to null and delete the effect once applied
+                    //for over time: same effects as clothing progressive TF
+                    //for temporary: after some time transforms back to stored part, but reverse TF cannot revert non-temporary TFs applied
+                }
+
+                if((this.getBodyMaterial()==BodyMaterial.SLIME || orificeIngestedThrough == SexAreaOrifice.VAGINA)
+                        && fluid.getBaseType()==FluidTypeBase.CUM) {
+                    if(charactersFluid!=null) {
+                        postSB.append(rollForPregnancy(charactersFluid, millilitres, Main.game.isInSex()));
+
+                    } else if(fluid.getSubspecies()!=null) {
+                        postSB.append(rollForPregnancy(fluid.getSubspecies(), fluid.getHalfDemonSubspecies(), millilitres, Main.game.isInSex()));
+                    }
+                }
+            }
+
+            if(id != "" && compact){
+                fluidText.put(
+                        "<span style ='color:"+charactersFluid.getFemininity().getColour().toWebHexString() + ";'>"
+                                + (charactersFluid == this
+                                ?"[npc.HerHis] own"
+                                :(charactersFluid.isPlayer()
+                                ?"your"
+                                :charactersFluid.getName() + "'s")) + " </span>"
+                        + Util.stringsToStringList(subString, false)
+                        , null);
             }
         }
-        String list = Util.stringsToStringList(new ArrayList<>(fluidText.keySet()), true);
+        //sorting so that "" IDs are always last, comparator returns 0 if two ""s or none are
+        List<Entry<String, FluidStored>> result = new ArrayList<>(fluidText.entrySet());
+        result.sort((a,b) -> (a.getValue() != null && a.getValue().getCharactersFluidID().equals("") ? 1 : 0)
+                + (b.getValue() != null && b.getValue().getCharactersFluidID().equals("") ? -1 : 0));
+
+        String list = Util.stringsToStringList(result.stream().map(entry -> entry.getKey()).collect(Collectors.toList()), true);
+        //removing the awkward "," before the "and" at the end
+        list = list.replaceAll(", and", " and");
+
         fluidIngestionSB.append("<p style='padding:0; margin:0; text-align:center;'><i>");
 
         switch(orificeIngestedThrough) {
@@ -19918,7 +19952,7 @@ public abstract class GameCharacter implements XMLSaving {
 		for(Entry<SexAreaOrifice, List<FluidStored>> entry : this.fluidsStoredMap.entrySet()) {
 			for(FluidStored fs : entry.getValue()) {
 				if(fs.getFluidModifiers().contains(FluidModifier.ADDICTIVE)) {
-					addAddiction(new Addiction(fs, Main.game.getMinutesPassed(), fs.getCharactersFluidID()));
+					addAddiction(new Addiction(fs.getType(), Main.game.getMinutesPassed(), fs.getCharactersFluidID()));
 				}
 				if(fs.getFluidModifiers().contains(FluidModifier.HALLUCINOGENIC)) {
 					this.addStatusEffect(StatusEffect.PSYCHOACTIVE, 6*60*60);
@@ -27430,11 +27464,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Milk:
-	public AbstractFluid getMilk() {
+	public Fluid getMilk() {
 		return body.getBreast().getMilk();
 	}
 	public AbstractFluidType getMilkType() {
-		return body.getBreast().getMilk();
+		return body.getBreast().getMilk().getType();
 	}
 	public String getMilkName() {
 		return body.getBreast().getMilk().getName(this);
@@ -27949,11 +27983,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Milk:
-	public AbstractFluid getMilkCrotch() {
+	public Fluid getMilkCrotch() {
 		return body.getBreastCrotch().getMilk();
 	}
 	public AbstractFluidType getMilkCrotchType() {
-		return body.getBreastCrotch().getMilk();
+		return body.getBreastCrotch().getMilk().getType();
 	}
 	public String getMilkCrotchName() {
 		return body.getBreastCrotch().getMilk().getName(this);
@@ -29766,11 +29800,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Cum:
-	public AbstractFluid getCum() {
+	public Fluid getCum() {
 		return getCurrentPenis().getTesticle().getCum();
 	}
 	public AbstractFluidType getCumType() {
-		return getCurrentPenis().getTesticle().getCum();
+		return getCurrentPenis().getTesticle().getCum().getType();
 	}
 	public String getCumName() {
 		return getCurrentPenis().getTesticle().getCum().getName(this);
@@ -30748,11 +30782,11 @@ public abstract class GameCharacter implements XMLSaving {
 	}
 	
 	// Girlcum:
-	public AbstractFluid getGirlcum() {
+	public Fluid getGirlcum() {
 		return body.getVagina().getGirlcum();
 	}
 	public AbstractFluidType getGirlcumType() {
-		return body.getVagina().getGirlcum();
+		return body.getVagina().getGirlcum().getType();
 	}
 	public String getGirlcumName() {
 		return body.getVagina().getGirlcum().getName(this);

@@ -547,13 +547,8 @@ public enum PregnancyDescriptor {
 	};
 	
 	private static boolean isCumInPussy(GameCharacter characterBeingImpregnated, GameCharacter characterProvidingCum) {
-		return characterBeingImpregnated.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f -> {
-			try {
-				return f.isCum() && f.getFluidCharacter()==characterProvidingCum;
-			} catch (Exception e) {
-				return false;
-			}
-		});
+		return characterBeingImpregnated.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f ->
+			f.isCum() && f.getFluidCharacter()==characterProvidingCum);
 	}
 	
 	public abstract String getDescriptor(GameCharacter characterBeingImpregnated, GameCharacter characterProvidingCum, boolean directSexInsemination);

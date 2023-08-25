@@ -36,6 +36,8 @@ public class ItemEffect implements XMLSaving {
 	private TFPotency potency;
 	private int limit;
 	private ItemEffectTimer timer;
+	private EffectTarget target = EffectTarget.SELF;
+	private boolean recursive = false;
 	
 	public ItemEffect(AbstractItemEffectType itemEffectType) {
 		this.itemEffectType = itemEffectType;
@@ -54,13 +56,26 @@ public class ItemEffect implements XMLSaving {
 		this.limit = limit;
 		this.timer = new ItemEffectTimer();
 	}
-	
+
+	public ItemEffect(AbstractItemEffectType itemEffectType, TFModifier primaryModifier, TFModifier secondaryModifier, TFPotency potency, int limit, EffectTarget target, boolean recursive) {
+		this.itemEffectType = itemEffectType;
+		this.primaryModifier = primaryModifier;
+		this.secondaryModifier = secondaryModifier;
+		this.potency = potency;
+		this.limit = limit;
+		this.timer = new ItemEffectTimer();
+		this.target = target;
+		this.recursive = recursive;
+	}
+
 	public String getId() {
 		return (itemEffectType==null?"n":itemEffectType.toString())
 				+ (primaryModifier==null?"n":primaryModifier.toString())
 				+ (secondaryModifier==null?"n":secondaryModifier.toString())
 				+ (potency==null?"n":potency.toString())
-				+ limit;
+				+ limit
+				+ target.toString()
+				+ (recursive?"r":"");
 	}
 	
 	@Override
@@ -71,7 +86,9 @@ public class ItemEffect implements XMLSaving {
 				&& ((ItemEffect)o).getPrimaryModifier() == primaryModifier
 				&& ((ItemEffect)o).getSecondaryModifier() == secondaryModifier
 				&& ((ItemEffect)o).getPotency() == potency
-				&& ((ItemEffect)o).getLimit() == limit){
+				&& ((ItemEffect)o).getLimit() == limit
+				&& ((ItemEffect)o).getTarget() == target
+				&& ((ItemEffect)o).isRecursive() == recursive){
 					return true;
 			}
 		}
@@ -94,6 +111,8 @@ public class ItemEffect implements XMLSaving {
 			result = 31 * result + potency.hashCode();
 		}
 		result = 31 * result + limit;
+		result = 31 * result + target.hashCode();
+		result = 31 * result + (recursive?13:1);
 		return result;
 	}
 	
@@ -107,6 +126,8 @@ public class ItemEffect implements XMLSaving {
 		XMLUtil.addAttribute(doc, effect, "potency", (getPotency()==null?"null":getPotency().toString()));
 		XMLUtil.addAttribute(doc, effect, "limit", String.valueOf(getLimit()));
 		XMLUtil.addAttribute(doc, effect, "timer", String.valueOf(getTimer().getSecondsPassed()));
+		XMLUtil.addAttribute(doc, effect, "target", String.valueOf(getTarget()));
+		XMLUtil.addAttribute(doc, effect, "recursive", String.valueOf(isRecursive()));
 		
 		return effect;
 	}
@@ -232,7 +253,13 @@ public class ItemEffect implements XMLSaving {
 		} catch(Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
+		if(parentElement.hasAttribute("target")){
+			ie.target = EffectTarget.valueOf(parentElement.getAttribute("target"));
+
+			ie.recursive = Boolean.valueOf(parentElement.getAttribute("recursive"));
+		}
+
 		return ie;
 	}
 	
@@ -419,6 +446,22 @@ public class ItemEffect implements XMLSaving {
 
 	public void setTimer(ItemEffectTimer timer) {
 		this.timer = timer;
+	}
+
+	public EffectTarget getTarget() {
+		return target;
+	}
+
+	public void setTarget(EffectTarget target) {
+		this.target = target;
+	}
+
+	public boolean isRecursive() {
+		return recursive;
+	}
+
+	public void setRecursive(boolean recursive) {
+		this.recursive = recursive;
 	}
 	
 }

@@ -422,7 +422,7 @@ public class MilkingRoom implements XMLSaving {
 		
 			for(FluidStored fluid : fluids) {
 				String idModifier = "";
-				AbstractFluidType type = fluid;
+				AbstractFluidType type = fluid.getType();
 				
 				if(fluid.isMilk()) {
 					idModifier = "MILK";
@@ -447,12 +447,11 @@ public class MilkingRoom implements XMLSaving {
 					milkyMilknessSB.append("</div>");
 				
 					milkyMilknessSB.append("<div class='container-half-width' style='margin:0; padding:2px; width:25%; background:transparent;'>");
-					GameCharacter fluidOwner = null;
-					try {
-						fluidOwner = fluid.getFluidCharacter();
+					GameCharacter fluidOwner = fluid.getFluidCharacter();
+					if(fluidOwner != null) {
 						milkyMilknessSB.append(UtilText.parse(fluidOwner, "<span style='color:"+fluidOwner.getFemininity().getColour().toWebHexString()+";'>[npc.NamePos]</span>"));
 						
-					} catch(Exception ex) {
+					} else {
 						milkyMilknessSB.append("[style.colourDisabled(Unknown's)]");
 					}
 					milkyMilknessSB.append("<br/>"

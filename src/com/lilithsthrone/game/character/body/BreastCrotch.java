@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractBreastType;
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.game.character.body.types.BreastType;
 import com.lilithsthrone.game.character.body.valueEnums.AreolaeShape;
 import com.lilithsthrone.game.character.body.valueEnums.BreastShape;
@@ -42,7 +43,7 @@ public class BreastCrotch implements BodyPartInterface {
 	protected int nippleCountPerBreast;
 	
 	protected Nipples nipples;
-	protected AbstractFluid milk;
+	protected Fluid milk;
 	
 	public BreastCrotch(AbstractBreastType type, BreastShape shape, int size, int milkStorage, int rows,
 			int nippleSize, NippleShape nippleShape, int areolaeSize, AreolaeShape areolaeShape, int nippleCountPerBreast, float capacity, int depth, int elasticity, int plasticity, boolean virgin) {
@@ -57,7 +58,8 @@ public class BreastCrotch implements BodyPartInterface {
 		
 		nipples = new Nipples(type.getNippleType(), nippleSize, nippleShape, areolaeSize, areolaeShape, Lactation.getLactationFromInt(milkStorage).getAssociatedWetness().getValue(), capacity, depth, elasticity, plasticity, virgin, true);
 		
-		milk = new AbstractFluid(type.getFluidType());
+		milk = new Fluid(type.getFluidType());
+		milk.getType().setSource(BodyPartType.BREAST_CROTCH);
 	}
 	
 	@Override
@@ -111,7 +113,7 @@ public class BreastCrotch implements BodyPartInterface {
 		return nipples;
 	}
 
-	public AbstractFluid getMilk() {
+	public Fluid getMilk() {
 		return milk;
 	}
 	

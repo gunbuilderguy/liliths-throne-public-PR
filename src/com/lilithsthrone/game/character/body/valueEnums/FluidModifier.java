@@ -1,8 +1,7 @@
 package com.lilithsthrone.game.character.body.valueEnums;
 
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.AbstractFluid;
-import com.lilithsthrone.game.character.body.AbstractFluid;
+import com.lilithsthrone.game.character.body.Fluid;
 import com.lilithsthrone.game.character.effects.Addiction;
 import com.lilithsthrone.game.character.effects.StatusEffect;
 import com.lilithsthrone.game.dialogue.utils.UtilText;
@@ -61,7 +60,7 @@ public enum FluidModifier {
 			"It has a high alcohol content, and will get those who consume it very drunk.",
 			"Strongly alcoholic fluids will greatly increase the intoxication level of anyone who consumes them.") {
 		@Override
-		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, AbstractFluid fluid) {
+		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, Fluid fluid) {
 			return target.incrementAlcoholLevel(millilitres * 0.001f); //TODO factor in body size
 		}
 	},
@@ -72,7 +71,7 @@ public enum FluidModifier {
 			"It has a low alcohol content, and will get those who consume it drunk.",
 			"Alcoholic fluids will increase the intoxication level of anyone who consumes them.") {
 		@Override
-		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, AbstractFluid fluid) {
+		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, Fluid fluid) {
 			return target.incrementAlcoholLevel(millilitres * 0.0001f); //TODO factor in body size
 		}
 	},
@@ -83,13 +82,13 @@ public enum FluidModifier {
 			"It is highly addictive, and anyone who drinks too much will quickly become dependent on it.",
 			"Addictive fluids will make anyone who consumes them become addicted to that particular type of fluid.") {
 		@Override
-		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, AbstractFluid fluid) {
+		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, Fluid fluid) {
 			if(target==null || fluidProvider==null) {
 				return ""; // catch for if one of the characters is null, which was the case in GameCharacter.calculateGenericSexEffects
 			}
-			boolean curedWithdrawal = target.getAddiction(fluid)!=null && Main.game.getMinutesPassed()-target.getAddiction(fluid).getLastTimeSatisfied()>=24*60;
+			boolean curedWithdrawal = target.getAddiction(fluid.getType())!=null && Main.game.getMinutesPassed()-target.getAddiction(fluid.getType()).getLastTimeSatisfied()>=24*60;
 			boolean appendAddiction = !Main.game.isInSex() || curedWithdrawal;
-			if(target.addAddiction(new Addiction(fluid, Main.game.getMinutesPassed(), fluidProvider.getId()))) {
+			if(target.addAddiction(new Addiction(fluid.getType(), Main.game.getMinutesPassed(), fluidProvider.getId()))) {
 				return UtilText.parse(target,
 						"<p style='padding:0; margin:0; text-align:center;'>"
 							+ "Due to the addictive properties of "+(fluidProvider==null?"":(fluidProvider.equals(target)?"[npc.her]":UtilText.parse(fluidProvider, "[npc.namePos]")))+" "+fluid.getName(fluidProvider)
@@ -99,7 +98,7 @@ public enum FluidModifier {
 				
 				
 			} else {
-				target.setLastTimeSatisfiedAddiction(fluid, Main.game.getMinutesPassed());
+				target.setLastTimeSatisfiedAddiction(fluid.getType(), Main.game.getMinutesPassed());
 				if(appendAddiction) {
 					return UtilText.parse(target, fluidProvider,
 							"<p style='padding:0; margin:0; text-align:center;'>"
@@ -125,8 +124,8 @@ public enum FluidModifier {
 			"Anyone who ingests it suffers psychoactive effects, which can manifest in lactation-related hallucinations or sensitivity to hypnotic suggestion.",
 			"Psychoactive fluids will cause anyone who ingests them to experience a hallucinogenic trip, causing their view of sexual organs to be distorted as well as opening them up to the possibility of being hypnotically manipulated.") {
 		@Override
-		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, AbstractFluid fluid) {
-			target.addPsychoactiveFluidIngested(fluid);
+		public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, Fluid fluid) {
+			target.addPsychoactiveFluidIngested(fluid.getType());
 			boolean appendPsychoactive = !target.hasStatusEffect(StatusEffect.PSYCHOACTIVE);
 			target.addStatusEffect(StatusEffect.PSYCHOACTIVE, 6*60*60);
 			if(appendPsychoactive) {
@@ -178,7 +177,7 @@ public enum FluidModifier {
 		return description!=null;
 	}
 	
-	public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, AbstractFluid fluid) {
+	public String applyEffects(GameCharacter target, GameCharacter fluidProvider, float millilitres, Fluid fluid) {
 		return "";
 	}
 }

@@ -13,7 +13,6 @@ import com.lilithsthrone.game.character.body.Body;
 import com.lilithsthrone.game.character.body.coverings.AbstractBodyCoveringType;
 import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
 import com.lilithsthrone.game.character.body.types.BodyPartTypeInterface;
-import com.lilithsthrone.game.character.body.types.FluidType;
 import com.lilithsthrone.game.character.body.types.NippleType;
 import com.lilithsthrone.game.character.body.valueEnums.BreastShape;
 import com.lilithsthrone.game.character.race.AbstractRace;
@@ -142,8 +141,8 @@ public abstract class AbstractBreastType implements BodyPartTypeInterface {
 				this.transformationName = coreElement.getMandatoryFirstOf("transformationName").getTextContent();
 				
 				this.nippleType = NippleType.getNippleTypeFromId(coreElement.getMandatoryFirstOf("nippleType").getTextContent());
-				this.fluidType = FluidType.getFluidTypeFromId(coreElement.getMandatoryFirstOf("fluidType").getTextContent());
-				
+				this.fluidType = com.lilithsthrone.game.character.body.types.FluidType.getFluidTypeFromId(coreElement.getMandatoryFirstOf("fluidType").getTextContent());
+
 				this.namesBreasts = new ArrayList<>();
 				for(Element e : coreElement.getMandatoryFirstOf("names").getAllOf("name")) {
 					namesBreasts.add(e.getTextContent());

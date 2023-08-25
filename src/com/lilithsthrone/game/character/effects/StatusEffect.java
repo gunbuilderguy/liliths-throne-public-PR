@@ -6509,13 +6509,13 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.ANUS).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.ANUS).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.MOUTH).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.MOUTH).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6558,13 +6558,13 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.ANUS).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.ANUS).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.MOUTH).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.MOUTH).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6608,13 +6608,13 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.ANUS).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.ANUS).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.MOUTH).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.MOUTH).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.VAGINA).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6658,7 +6658,7 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.NIPPLE).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.NIPPLE).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6701,7 +6701,7 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.NIPPLE).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.NIPPLE).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6745,7 +6745,7 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.NIPPLE).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.NIPPLE).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6788,7 +6788,7 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.SPINNERET).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.SPINNERET).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6836,7 +6836,7 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.SPINNERET).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.SPINNERET).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}
@@ -6884,7 +6884,7 @@ public class StatusEffect {
 		public String getDescription(GameCharacter target) {
 			List<String> fluidNames = new ArrayList<>();
 			for(FluidTypeBase ftb : FluidTypeBase.values()) {
-				if(target.getFluidsStoredInOrifice(SexAreaOrifice.SPINNERET).stream().anyMatch(f->f.getFluid().getType().getBaseType()==ftb)) {
+				if(target.getFluidsStoredInOrifice(SexAreaOrifice.SPINNERET).stream().anyMatch(f->f.getBaseType()==ftb)) {
 					fluidNames.add(Util.randomItemFrom(ftb.getNames()));
 				}
 			}

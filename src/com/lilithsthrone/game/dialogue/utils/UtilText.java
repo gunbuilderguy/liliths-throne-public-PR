@@ -243,7 +243,7 @@ public class UtilText {
 	private static Body body;
 	private static AbstractRace race;
 	private static CharacterInventory inventory;
-	private static AbstractFluid fluid;
+	private static Fluid fluid;
 
 //	private static List<GameCharacter> specialNPCList = new ArrayList<>();
 	private static boolean parseCapitalise;
@@ -9944,8 +9944,8 @@ public class UtilText {
 			engine.put("PLASTICITY_"+plasticity.toString(), plasticity);
 		}
 		// Types:
-		for(AbstractFluidType fluidType : FluidType.getAllFluidTypes()) {
-			engine.put("FLUID_TYPE_"+FluidType.getIdFromFluidType(fluidType), fluidType);
+		for(AbstractFluidType fluidType : com.lilithsthrone.game.character.body.types.FluidType.getAllFluidTypes()) {
+			engine.put("FLUID_TYPE_"+ com.lilithsthrone.game.character.body.types.FluidType.getIdFromFluidType(fluidType), fluidType);
 		}
 		for(AbstractAntennaType type : AntennaType.getAllAntennaTypes()) {
 			engine.put("ANTENNA_TYPE_"+AntennaType.getIdFromAntennaType(type), type);
@@ -10648,7 +10648,7 @@ public class UtilText {
 			case BREAST:
 				return character.getBody().getBreast();
 			case MILK:
-				return (BodyPartInterface) character.getBody().getBreast().getMilk();
+				return character.getBody().getBreast().getMilk();
 			case NIPPLES:
 				return character.getBody().getBreast().getNipples();
 			case BREAST_CROTCH:
@@ -10656,7 +10656,7 @@ public class UtilText {
 			case NIPPLES_CROTCH:
 				return character.getBody().getBreastCrotch().getNipples();
 			case MILK_CROTCH:
-				return (BodyPartInterface) character.getBody().getBreastCrotch().getMilk();
+				return character.getBody().getBreastCrotch().getMilk();
 			case EAR:
 				return character.getBody().getEar();
 			case EYE:
@@ -10678,7 +10678,7 @@ public class UtilText {
 			case TESTICLES:
 				return character.getCurrentPenis().getTesticle();
 			case CUM:
-				return (BodyPartInterface) character.getCurrentPenis().getTesticle().getCum();
+				return character.getCurrentPenis().getTesticle().getCum();
 			case SKIN:
 				return character.getBody().getTorso();
 			case TAIL:
@@ -10695,7 +10695,7 @@ public class UtilText {
 			case VAGINA:
 				return character.getBody().getVagina();
 			case GIRL_CUM:
-				return (BodyPartInterface) character.getBody().getVagina().getGirlcum();
+				return character.getBody().getVagina().getGirlcum();
 			case WING:
 				return character.getBody().getWing();
 			case GENERIC:
@@ -10862,11 +10862,11 @@ public class UtilText {
 		engine.put(tag, getInventoryForParsing());
 	}
 
-	public static AbstractFluid getFluidForParsing() {
+	public static Fluid getFluidForParsing() {
 		return fluid;
 	}
 
-	public static void setFluidForParsing(String tag, AbstractFluid fluid) {
+	public static void setFluidForParsing(String tag, Fluid fluid) {
 		UtilText.fluid = fluid;
 		if(engine==null) {
 			initScriptEngine();

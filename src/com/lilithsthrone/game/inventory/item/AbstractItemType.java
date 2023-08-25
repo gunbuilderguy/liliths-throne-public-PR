@@ -602,9 +602,9 @@ public abstract class AbstractItemType extends AbstractCoreType {
 //						SVGString = SvgUtil.colourReplacement(this.getId(), colourShades, null, SVGString);
 						
 					} else {
-						InputStream is = this.getClass().getResourceAsStream("/com/lilithsthrone/res/items/" + svgPathInformation.get(0).getPathName() + ".svg");
+						InputStream is = this.getClass().getResourceAsStream("/com/lilithsthrone/res/items/" + getPathNameInformation().get(0).getPathName() + ".svg");
 						if(is==null) {
-							System.err.println("Error! AbstractItemType icon file does not exist (Trying to read from '"+svgPathInformation.get(0).getPathName()+"')!");
+							System.err.println("Error! AbstractItemType icon file does not exist (Trying to read from '"+getPathNameInformation().get(0).getPathName()+"')!");
 						}
 						String s = Util.inputStreamToString(is);
 						SVGString = SvgUtil.colourReplacement(this.getId(), colourShades, null, s);

@@ -599,7 +599,7 @@ public class Body implements XMLSaving {
 				XMLUtil.addAttribute(doc, nippleModifiers, om.toString(), "true");
 			}
 			
-		this.breast.milk.saveAsXML(parentElement, doc);
+		this.breast.milk.saveAsXML(parentElement, doc, "milk");
 		
 		// Crotch Breasts:
 		Element bodyCrotchBreast = doc.createElement("breastsCrotch");
@@ -632,7 +632,7 @@ public class Body implements XMLSaving {
 				XMLUtil.addAttribute(doc, crotchNippleModifiers, om.toString(), "true");
 			}
 			
-		this.breastCrotch.milk.saveAsXML(parentElement, doc);
+		this.breastCrotch.milk.saveAsXML(parentElement, doc, "crotchMilk");
 		
 		
 		// Ear:
@@ -742,7 +742,7 @@ public class Body implements XMLSaving {
 			XMLUtil.addAttribute(doc, bodyTesticle, "numberOfTesticles", String.valueOf(this.penis.testicle.testicleCount));
 			XMLUtil.addAttribute(doc, bodyTesticle, "internal", String.valueOf(this.penis.testicle.internal));
 		
-		this.penis.testicle.cum.saveAsXML(parentElement, doc);
+		this.penis.testicle.cum.saveAsXML(parentElement, doc, "cum");
 
 		// Spinneret:
 		Element bodySpinneret = doc.createElement("spinneret");
@@ -823,7 +823,7 @@ public class Body implements XMLSaving {
 				XMLUtil.addAttribute(doc, urethraModifiers, om.toString(), "true");
 			}
 			
-		this.vagina.girlcum.saveAsXML(parentElement, doc);
+		this.vagina.girlcum.saveAsXML(parentElement, doc, "girlcum");
 
 		// Wing:
 		Element bodyWing = doc.createElement("wing");
@@ -1082,7 +1082,7 @@ public class Body implements XMLSaving {
 		
 		Main.game.getCharacterUtils().appendToImportLog(log, "<br/><br/>Milk:");
 		
-		importedBreast.milk = AbstractFluid.loadFromXML(parentElement, doc, importedBreast.getType().getFluidType(), "milk");
+		importedBreast.milk = Fluid.loadFromXML(parentElement, doc, importedBreast.getType().getFluidType(), "milk");
 		if(Main.isVersionOlderThan(Main.VERSION_NUMBER, "0.2.5.1")) {
 			importedBreast.milk.setType(importedBreast.getType().getFluidType());
 		}
@@ -1444,7 +1444,7 @@ public class Body implements XMLSaving {
 		
 		Main.game.getCharacterUtils().appendToImportLog(log, "<br/><br/>Cum:");
 		
-		importedPenis.testicle.cum = AbstractFluid.loadFromXML(parentElement, doc, importedPenis.getType().getTesticleType().getFluidType(), "cum");
+		importedPenis.testicle.cum = Fluid.loadFromXML(parentElement, doc, importedPenis.getType().getTesticleType().getFluidType(), "cum");
 
 		
 		// **************** Skin **************** //
@@ -1662,7 +1662,7 @@ public class Body implements XMLSaving {
 		
 		Main.game.getCharacterUtils().appendToImportLog(log, "<br/><br/>Girlcum:");
 		
-		importedVagina.girlcum = AbstractFluid.loadFromXML(parentElement, doc, importedVagina.getType().getFluidType(), "girlcum");
+		importedVagina.girlcum = Fluid.loadFromXML(parentElement, doc, importedVagina.getType().getFluidType(), "girlcum");
 		
 		// **************** Wing **************** //
 		
@@ -1883,9 +1883,9 @@ public class Body implements XMLSaving {
 			Main.game.getCharacterUtils().appendToImportLog(log, "<br/><br/>Milk:");
 
 			if(parentElement.getElementsByTagName("milkCrotch").item(0)==null) {
-				importedCrotchBreast.milk = AbstractFluid.loadFromXML(parentElement, doc, importedCrotchBreast.getType().getFluidType(), "milk");
+				importedCrotchBreast.milk = Fluid.loadFromXML(parentElement, doc, importedCrotchBreast.getType().getFluidType(), "crotchMilk");
 			} else {
-				importedCrotchBreast.milk = AbstractFluid.loadFromXML(parentElement, doc, importedCrotchBreast.getType().getFluidType(), "milkCrotch");
+				importedCrotchBreast.milk = Fluid.loadFromXML(parentElement, doc, importedCrotchBreast.getType().getFluidType(), "milkCrotch");
 			}
 			if(Main.isVersionOlderThan(Main.VERSION_NUMBER, "0.2.5.1")) {
 				importedCrotchBreast.milk.setType(importedCrotchBreast.getType().getFluidType());

@@ -3416,8 +3416,8 @@ public class Subspecies {
 			if(body.getFace().getType()==FaceType.HORSE_MORPH && (!body.isFeminine() || Math.random()<0.5f)) {
 				body.getHair().setStyle(null, HairStyle.NONE); // Sets hair style to mane
 			}
-			body.getPenis().getTesticle().getCum().addFluidModifier(null, FluidModifier.MUSKY);
-			body.getVagina().getGirlcum().addFluidModifier(null, FluidModifier.MUSKY);
+			body.getPenis().getTesticle().getCum().addFluidModifier(FluidModifier.MUSKY);
+			body.getVagina().getGirlcum().addFluidModifier(FluidModifier.MUSKY);
 		}
 		@Override
 		public String[] getHalfDemonName(Body body) {
@@ -3494,8 +3494,8 @@ public class Subspecies {
 			if(body.getFace().getType()==FaceType.HORSE_MORPH && (!body.isFeminine() || Math.random()<0.5f)) {
 				body.getHair().setStyle(null, HairStyle.NONE); // Sets hair style to mane
 			}
-			body.getPenis().getTesticle().getCum().addFluidModifier(null, FluidModifier.MUSKY);
-			body.getVagina().getGirlcum().addFluidModifier(null, FluidModifier.MUSKY);
+			body.getPenis().getTesticle().getCum().addFluidModifier(FluidModifier.MUSKY);
+			body.getVagina().getGirlcum().addFluidModifier(FluidModifier.MUSKY);
 		}
 		@Override
 		public String[] getHalfDemonName(Body body) {
@@ -3578,8 +3578,8 @@ public class Subspecies {
 			if(body.getFace().getType()==FaceType.HORSE_MORPH && (!body.isFeminine() || Math.random()<0.5f)) {
 				body.getHair().setStyle(null, HairStyle.NONE); // Sets hair style to mane
 			}
-			body.getPenis().getTesticle().getCum().addFluidModifier(null, FluidModifier.MUSKY);
-			body.getVagina().getGirlcum().addFluidModifier(null, FluidModifier.MUSKY);
+			body.getPenis().getTesticle().getCum().addFluidModifier(FluidModifier.MUSKY);
+			body.getVagina().getGirlcum().addFluidModifier(FluidModifier.MUSKY);
 		}
 		@Override
 		public String[] getHalfDemonName(Body body) {
@@ -3661,8 +3661,8 @@ public class Subspecies {
 			if(body.getFace().getType()==FaceType.HORSE_MORPH && (!body.isFeminine() || Math.random()<0.5f)) {
 				body.getHair().setStyle(null, HairStyle.NONE); // Sets hair style to mane
 			}
-			body.getPenis().getTesticle().getCum().addFluidModifier(null, FluidModifier.MUSKY);
-			body.getVagina().getGirlcum().addFluidModifier(null, FluidModifier.MUSKY);
+			body.getPenis().getTesticle().getCum().addFluidModifier(FluidModifier.MUSKY);
+			body.getVagina().getGirlcum().addFluidModifier(FluidModifier.MUSKY);
 		}
 		@Override
 		public String[] getHalfDemonName(Body body) {

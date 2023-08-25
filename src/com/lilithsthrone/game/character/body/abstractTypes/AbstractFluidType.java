@@ -3,14 +3,17 @@ package com.lilithsthrone.game.character.body.abstractTypes;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-import com.lilithsthrone.game.dialogue.utils.UtilText;
+import com.lilithsthrone.game.character.body.Body;
+import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.main.Main;
 import org.w3c.dom.Document;
 
 import com.lilithsthrone.controller.xmlParsing.Element;
 import com.lilithsthrone.game.character.GameCharacter;
-import com.lilithsthrone.game.character.body.Body;
 import com.lilithsthrone.game.character.body.coverings.AbstractBodyCoveringType;
 import com.lilithsthrone.game.character.body.types.BodyPartTypeInterface;
 import com.lilithsthrone.game.character.body.valueEnums.FluidFlavour;
@@ -31,7 +34,7 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 	private boolean fromExternalFile;
 
 	private String transformationName;
-	
+
 	private FluidTypeBase baseFluidType;
 
 	/**
@@ -39,6 +42,7 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 	 */
 	private FluidFlavour baseFlavour;
 	private AbstractRace race;
+	public AbstractBodyCoveringType coveringType;
 
 	private List<String> baseNames;
 	private List<String> namesMasculine;
@@ -51,16 +55,20 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 
 	List<FluidModifier> defaultFluidModifiers;
 
+	BodyPartType source;
+
 	public AbstractFluidType(AbstractFluidType type) {
 		this.baseFluidType = type.baseFluidType;
 		this.baseFlavour = type.baseFlavour;
 		this.race = type.race;
+		this.coveringType = type.coveringType;
 		this.transformationName = type.transformationName;
 		this.namesMasculine = type.namesMasculine;
 		this.namesFeminine = type.namesFeminine;
 		this.descriptorsMasculine = type.descriptorsMasculine;
 		this.descriptorsFeminine = type.descriptorsFeminine;
 		this.defaultFluidModifiers = type.defaultFluidModifiers;
+		this.source = type.source;
 	}
 
 	/**
@@ -140,6 +148,10 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 				this.fromExternalFile = true;
 				
 				this.race = Race.getRaceFromId(coreElement.getMandatoryFirstOf("race").getTextContent());
+				Optional<Element> covering = coreElement.getOptionalFirstOf("coveringType");
+				if(covering.isPresent()){
+					this.coveringType = BodyCoveringType.getBodyCoveringTypeFromId(covering.get().getTextContent());
+				}
 				this.baseFluidType = FluidTypeBase.valueOf(coreElement.getMandatoryFirstOf("baseFluidType").getTextContent());
 				this.baseFlavour = FluidFlavour.valueOf(coreElement.getMandatoryFirstOf("flavour").getTextContent());
 				
@@ -187,6 +199,51 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 			}
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = 31 * result + (mod?1:0);
+		result = 31 * result + (fromExternalFile?1:0);
+		if(transformationName != null){
+			result = 31 * result + transformationName.hashCode();
+		}
+		result = 31 * result + baseFlavour.hashCode();
+		result = 31 * result + baseFluidType.hashCode();
+		result = 31 * result + race.hashCode();
+		if(namesFeminine != null){
+			result = 31 * result + namesFeminine.hashCode();
+		}
+		if(namesMasculine != null){
+			result = 31 * result + namesMasculine.hashCode();
+		}
+		result = 31 * result + descriptorsFeminine.hashCode();
+		result = 31 * result + descriptorsMasculine.hashCode();
+		result = 31 * result + defaultFluidModifiers.hashCode();
+		if(valuePerMl != null){
+			result = 31 * result + valuePerMl.hashCode();
+		}
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		return (o instanceof AbstractFluidType)
+				&& Objects.equals(mod, ((AbstractFluidType)o).mod)
+				&& Objects.equals(fromExternalFile, ((AbstractFluidType)o).fromExternalFile)
+				&& Objects.equals(transformationName, ((AbstractFluidType)o).transformationName)
+				&& Objects.equals(baseFlavour, ((AbstractFluidType)o).baseFlavour)
+				&& Objects.equals(baseFluidType, ((AbstractFluidType)o).baseFluidType)
+				&& Objects.equals(race, ((AbstractFluidType)o).race)
+				&& Objects.equals(namesFeminine, ((AbstractFluidType)o).namesFeminine)
+				&& Objects.equals(namesMasculine, ((AbstractFluidType)o).namesMasculine)
+				&& Objects.equals(descriptorsFeminine, ((AbstractFluidType)o).descriptorsFeminine)
+				&& Objects.equals(descriptorsFeminine, ((AbstractFluidType)o).descriptorsFeminine)
+				&& Objects.equals(descriptorsMasculine, ((AbstractFluidType)o).descriptorsMasculine)
+				&& Objects.equals(defaultFluidModifiers, ((AbstractFluidType)o).defaultFluidModifiers)
+				&& Objects.equals(valuePerMl, ((AbstractFluidType)o).valuePerMl
+		);
+	}
 	
 	public boolean isMod() {
 		return mod;
@@ -206,7 +263,8 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 		System.err.println("Warning! AbstractFluidType is calling toString()");
 		return super.toString();
 	}
-	
+
+
 	@Override
 	public String getDeterminer(GameCharacter gc) {
 		return "some";
@@ -268,8 +326,16 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 		}
 	}
 
+
 	@Override
 	public AbstractBodyCoveringType getBodyCoveringType(Body body) {
+		if(coveringType == null){
+			return getBaseFluidCoveringType();
+		}
+		return coveringType;
+	}
+
+	public AbstractBodyCoveringType getBaseFluidCoveringType() {
 		return baseFluidType.getCoveringType();
 	}
 
@@ -309,4 +375,13 @@ public abstract class AbstractFluidType implements BodyPartTypeInterface {
 	public String getValuePerMlString(){
 		return valuePerMl;
 	}
+
+	public BodyPartType getSource() {
+		return source;
+	}
+
+	public void setSource(BodyPartType source){
+		source = source;
+	}
+
 }

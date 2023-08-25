@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractBreastType;
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.game.character.body.valueEnums.AreolaeShape;
 import com.lilithsthrone.game.character.body.valueEnums.BreastShape;
 import com.lilithsthrone.game.character.body.valueEnums.Capacity;
@@ -40,7 +41,7 @@ public class Breast implements BodyPartInterface {
 	protected int nippleCountPerBreast;
 	
 	protected Nipples nipples;
-	protected AbstractFluid milk;
+	protected Fluid milk;
 	
 	/**
 	 * @param size in inches from bust to underbust using the UK system.
@@ -59,7 +60,8 @@ public class Breast implements BodyPartInterface {
 		
 		nipples = new Nipples(type.getNippleType(), nippleSize, nippleShape, areolaeSize, areolaeShape, Lactation.getLactationFromInt(milkStorage).getAssociatedWetness().getValue(), capacity, depth, elasticity, plasticity, virgin, false);
 		
-		milk = new AbstractFluid(type.getFluidType());
+		milk = new Fluid(type.getFluidType());
+		milk.getType().setSource(BodyPartType.BREAST);
 	}
 	
 	@Override
@@ -101,7 +103,7 @@ public class Breast implements BodyPartInterface {
 		return nipples;
 	}
 
-	public AbstractFluid getMilk() {
+	public Fluid getMilk() {
 		return milk;
 	}
 	

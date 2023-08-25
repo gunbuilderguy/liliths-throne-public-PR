@@ -838,8 +838,24 @@ public class BodyCoveringType {
 			null,
 			null) {
 	};
-	
+
 	public static AbstractBodyCoveringType MILK = new AbstractBodyCoveringType(
+			BodyCoveringCategory.FLUID,
+			"",
+			false,
+			"milk",
+			"milk",
+			Util.newArrayListOfValues(CoveringModifier.FLUID),
+			null,
+			Util.newHashMapOfValues(new Value<>(CoveringPattern.FLUID, 1)),
+			null,
+			Util.newArrayListOfValues(PresetColour.COVERING_WHITE),
+			PresetColour.allCoveringColours,
+			null,
+			null) {
+	};
+
+	public static AbstractBodyCoveringType MILK_CROTCH = new AbstractBodyCoveringType(
 			BodyCoveringCategory.FLUID,
 			"",
 			false,

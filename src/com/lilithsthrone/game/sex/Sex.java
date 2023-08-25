@@ -3447,7 +3447,7 @@ public class Sex {
 			}
 		}
 		
-		if(wetAreas.get(characterGettingLubricated).get(sexArea).get(characterProvidingLubrication).add(lubrication)) {
+		if(characterProvidingLubrication!= null && wetAreas.get(characterGettingLubricated).get(sexArea).get(characterProvidingLubrication).add(lubrication)) {
 			if(appendDescription
 					&& (sexArea!=SexAreaPenetration.TONGUE || lubrication!=LubricationType.SALIVA)) {
 				if(characterProvidingLubrication==null) {
@@ -3716,41 +3716,16 @@ public class Sex {
 					&& !characterPenetrated.getFluidsStoredInOrifice(actualOrifice).isEmpty()) {
 					List<FluidStored> fluids = characterPenetrated.drainTotalFluidsStored(actualOrifice, 25);
 					for(FluidStored fluid : fluids) {
-						try {
-							GameCharacter fluidCharacter = fluid.getFluidCharacter();
-							penetrationSB.append(
-									"<p style='text-align:center; margin-bottom:0; padding-bottom:0; color:"+PresetColour.BASE_ORANGE.toWebHexString()+";'><i>"
+						GameCharacter fluidCharacter = fluid.getFluidCharacter();
+						penetrationSB.append(
+								"<p style='text-align:center; margin-bottom:0; padding-bottom:0; color:"+PresetColour.BASE_ORANGE.toWebHexString()+";'><i>"
 										+ UtilText.parse(characterPenetrating, characterPenetrated, "[npc.Name] [npc.verb(find)] [npc.herself] swallowing down some fluids previously deposited in [npc2.namePos] "+orifice.getName(characterPenetrated)+"!")
-									+ "</i></p>"
-									+ characterPenetrating.ingestFluid(
-											fluidCharacter,
-											fluid,
-											SexAreaOrifice.MOUTH,
-											fluid.getMillilitres()));
-						} catch(Exception ex) {
-							if(fluid.isCum()) {
-								penetrationSB.append(
-										"<p style='text-align:center; margin-bottom:0; padding-bottom:0; color:"+PresetColour.BASE_ORANGE.toWebHexString()+";'><i>"
-											+ UtilText.parse(characterPenetrating, characterPenetrated, "[npc.Name] [npc.verb(find)] [npc.herself] swallowing down some fluids previously deposited in [npc2.namePos] "+orifice.getName(characterPenetrated)+"!")
 										+ "</i></p>"
 										+ characterPenetrating.ingestFluid(
-												null,
-												fluid.getSubspecies(),
-												fluid.getHalfDemonSubspecies(),
-												fluid,
-												SexAreaOrifice.MOUTH,
-												fluid.getMillilitres()));
-							} else {
-								penetrationSB.append(
-										"<p style='text-align:center; margin-bottom:0; padding-bottom:0; color:"+PresetColour.BASE_ORANGE.toWebHexString()+";'><i>"
-											+ UtilText.parse(characterPenetrating, characterPenetrated, "[npc.Name] [npc.verb(find)] [npc.herself] swallowing down some fluids previously deposited in [npc2.namePos] "+orifice.getName(characterPenetrated)+"!")
-										+ "</i></p>"
-										+ characterPenetrating.ingestFluid(
-												fluid,
-												SexAreaOrifice.MOUTH,
-												fluid.getMillilitres()));
-							}
-						}
+										fluidCharacter,
+										fluid,
+										SexAreaOrifice.MOUTH,
+										fluid.getMillilitres()));
 					}
 				}
 			}

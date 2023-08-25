@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.main.Main;
 import org.w3c.dom.Document;
 
@@ -13,7 +14,6 @@ import com.lilithsthrone.game.character.body.Body;
 import com.lilithsthrone.game.character.body.coverings.AbstractBodyCoveringType;
 import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
 import com.lilithsthrone.game.character.body.types.BodyPartTypeInterface;
-import com.lilithsthrone.game.character.body.types.FluidType;
 import com.lilithsthrone.game.character.race.AbstractRace;
 import com.lilithsthrone.game.character.race.Race;
 import com.lilithsthrone.game.dialogue.utils.UtilText;
@@ -58,6 +58,7 @@ public abstract class AbstractTesticleType implements BodyPartTypeInterface {
 		this.coveringType = coveringType;
 		this.race = race;
 		this.fluidType = fluidType;
+
 		this.internal = internal;
 		
 		this.names = names;
@@ -92,7 +93,7 @@ public abstract class AbstractTesticleType implements BodyPartTypeInterface {
 				this.race = Race.getRaceFromId(coreElement.getMandatoryFirstOf("race").getTextContent());
 				this.coveringType = BodyCoveringType.getBodyCoveringTypeFromId(coreElement.getMandatoryFirstOf("coveringType").getTextContent());
 				
-				this.fluidType = FluidType.getFluidTypeFromId(coreElement.getMandatoryFirstOf("fluidType").getTextContent());
+				this.fluidType = com.lilithsthrone.game.character.body.types.FluidType.getFluidTypeFromId(coreElement.getMandatoryFirstOf("fluidType").getTextContent());
 
 				this.internal = Boolean.valueOf(coreElement.getMandatoryFirstOf("internal").getTextContent());
 				

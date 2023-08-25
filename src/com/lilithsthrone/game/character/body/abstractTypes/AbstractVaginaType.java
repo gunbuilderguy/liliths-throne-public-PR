@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.main.Main;
 import org.w3c.dom.Document;
 
@@ -15,7 +16,6 @@ import com.lilithsthrone.game.character.body.Body;
 import com.lilithsthrone.game.character.body.coverings.AbstractBodyCoveringType;
 import com.lilithsthrone.game.character.body.coverings.BodyCoveringType;
 import com.lilithsthrone.game.character.body.types.BodyPartTypeInterface;
-import com.lilithsthrone.game.character.body.types.FluidType;
 import com.lilithsthrone.game.character.body.valueEnums.OrificeModifier;
 import com.lilithsthrone.game.character.race.AbstractRace;
 import com.lilithsthrone.game.character.race.Race;
@@ -103,6 +103,7 @@ public abstract class AbstractVaginaType implements BodyPartTypeInterface {
 		
 		this.coveringType = coveringType;
 		this.fluidType = fluidType;
+
 		this.race = race;
 		this.eggLayer = eggLayer;
 
@@ -165,7 +166,8 @@ public abstract class AbstractVaginaType implements BodyPartTypeInterface {
 					this.pubicHairAllowed = Boolean.valueOf(coreElement.getMandatoryFirstOf("pubicHairAllowed").getTextContent());
 				}
 				
-				this.fluidType = FluidType.getFluidTypeFromId(coreElement.getMandatoryFirstOf("fluidType").getTextContent());
+				this.fluidType = com.lilithsthrone.game.character.body.types.FluidType.getFluidTypeFromId(coreElement.getMandatoryFirstOf("fluidType").getTextContent());
+
 				this.eggLayer = Boolean.valueOf(coreElement.getMandatoryFirstOf("eggLayer").getTextContent());
 				
 				this.names = new ArrayList<>();

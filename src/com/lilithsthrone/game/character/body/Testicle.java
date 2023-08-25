@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lilithsthrone.game.character.GameCharacter;
 import com.lilithsthrone.game.character.body.abstractTypes.AbstractTesticleType;
+import com.lilithsthrone.game.character.body.types.BodyPartType;
 import com.lilithsthrone.game.character.body.valueEnums.CumProduction;
 import com.lilithsthrone.game.character.body.valueEnums.FluidExpulsion;
 import com.lilithsthrone.game.character.body.valueEnums.FluidRegeneration;
@@ -38,7 +39,7 @@ public class Testicle implements BodyPartInterface {
 	protected int cumExpulsion;
 	protected boolean internal;
 	
-	protected AbstractFluid cum;
+	protected Fluid cum;
 
 	public Testicle(AbstractTesticleType type, int testicleSize, int cumStorage, int testicleCount) {
 		this.type = type;
@@ -52,10 +53,11 @@ public class Testicle implements BodyPartInterface {
 		
 		internal = type.isInternal();
 		
-		cum = new AbstractFluid(type.getFluidType());
+		cum = new Fluid(type.getFluidType());
+		cum.getType().setSource(BodyPartType.PENIS);
 	}
 
-	public AbstractFluid getCum() {
+	public Fluid getCum() {
 		return cum;
 	}
 

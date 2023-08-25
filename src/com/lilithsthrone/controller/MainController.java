@@ -1617,6 +1617,8 @@ public class MainController implements Initializable {
 					|| currentNode.equals(InventoryDialogue.DYE_EQUIPPED_WEAPON)) {
 				InventoryController.initWeaponDyeListeners();
 				InventoryController.initDamageTypeListeners();
+			} else if (currentNode.equals(InventoryDialogue.MANAGE_FLUIDS)){
+				InventoryController.initFluidManagementListeners();
 			} else {
 				InventoryController.initInventoryListeners();
 			}
@@ -1624,7 +1626,7 @@ public class MainController implements Initializable {
 			MiscController.initMapListeners(WorldType.DOMINION, false);
 		} else if (currentNode.equals(LilayaMilkingRoomDialogue.MILKING_ROOM)) {
 			MilkingRoom room = Main.game.getOccupancyUtil().getMilkingRoom(Main.game.getPlayerCell().getType(), Main.game.getPlayerCell().getLocation());
-			for (FluidStored fluid : room.getFluidsStored()) {
+			for (FluidStored fluid : room.getFluidsStored().getFluids()) {
 				OccupantController.fluidHandler(room, fluid);
 			}
 		} else if (currentNode.equals(OccupantManagementDialogue.ROOM_MANAGEMENT)) {
